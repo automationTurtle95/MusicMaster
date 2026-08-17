@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isManager } from "@/lib/authz";
 import { memberCreateSchema } from "@/lib/validations/member";
 
 // GET /api/members – Liste (geschützt durch Middleware)
@@ -22,8 +24,8 @@ export async function GET() {
 // POST /api/members – Neues Mitglied anlegen (validiert via Zod)
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Nicht authentifiziert" }, { status: 401 });
+  if (!isManager(session?.user?.role)) {
+    return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
   }
 
   const body = await request.json().catch(() => null);

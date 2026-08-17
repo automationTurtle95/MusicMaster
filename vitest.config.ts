@@ -8,6 +8,9 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
+    env: {
+      DATABASE_URL: process.env.DATABASE_URL ?? "file:./dev.db",
+    },
     include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
   },
   resolve: {
