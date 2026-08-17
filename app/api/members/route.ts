@@ -5,18 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { isManager } from "@/lib/authz";
 import { memberCreateSchema } from "@/lib/validations/member";
 
-// GET /api/members – Liste (geschützt durch Middleware)
+// GET /api/members – Liste (geschützt durch Middleware).
+// Voller Datensatz, damit der Edit-Dialog ohne erneuten Fetch alle Felder
+// (Adresse, Telefon, Beitritt, Notizen) korrekt vorbelegen kann – sonst
+// würden beim PATCH nicht gelieferte Felder zu Leerstrings überschrieben.
 export async function GET() {
   const members = await prisma.member.findMany({
     orderBy: { lastName: "asc" },
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      email: true,
-      instrument: true,
-      active: true,
-    },
   });
   return NextResponse.json({ members });
 }
@@ -37,6 +32,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const member = await prisma.member.create({ data: parsed.data });
+  // Leere E-Mail als NULL speichern, damit die Unique-Constraint mehrfach
+  // für Mitglieder ohne E-Mail erlaubt ist (SQLite erlaubt doppelte NULL, nicht "").
+  const data = {
+    ...parsed.data,
+    email: parsed.data.email === "" ? null : parsed.data.email,
+  };
+
+  const member = await prisma.member.create({ data });
   return NextResponse.json({ member }, { status: 201 });
 }

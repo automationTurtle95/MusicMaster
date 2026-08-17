@@ -43,9 +43,16 @@ export async function PATCH(
     return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
   }
 
+  // Leere E-Mail als NULL speichern (siehe POST), damit die Unique-Constraint
+  // mehrfach für Mitglieder ohne E-Mail erlaubt ist.
+  const data = {
+    ...parsed.data,
+    email: parsed.data.email === "" ? null : parsed.data.email,
+  };
+
   const member = await prisma.member.update({
     where: { id },
-    data: parsed.data,
+    data,
   });
   return NextResponse.json({ member });
 }
