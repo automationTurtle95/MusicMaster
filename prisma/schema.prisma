@@ -1,0 +1,159 @@
+// MusicMaster – Prisma Schema (MVP)
+//
+// Hinweis: Dev-DB ist SQLite (Zero-Config). SQLite unterstützt keine
+// Prisma-Enums, daher werden enum-artige Felder (role, attendance status,
+// sheet difficulty) als `String` persistiert und an der API-Grenze per
+// Zod-Enum validiert (siehe lib/validations). Bei Wechsel auf PostgreSQL
+// (prod) können echte Enums ergänzt werden.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js (NextAuth v5) Adapter-Modelle
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String? // nur für Credentials-Login (scrypt-Hash)
+  role          String    @default("MEMBER") // ADMIN | BOARD | MEMBER
+  memberId      String?   @unique
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Domänen-Modelle
+// ---------------------------------------------------------------------------
+
+model Member {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String?  @unique
+  phone     String?
+  street    String?
+  city      String?
+  zip       String?
+  instrument String
+  active    Boolean  @default(true)
+  joinedAt  DateTime?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attendances Attendance[]
+  eventMembers EventMember[]
+}
+
+model Rehearsal {
+  id        String   @id @default(uuid())
+  title     String
+  startsAt  DateTime
+  location  String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  attendances Attendance[]
+}
+
+model Attendance {
+  id           String  @id @default(uuid())
+  rehearsalId  String
+  memberId     String
+  status       String // PRESENT | EXCUSED | ABSENT
+  note         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  rehearsal Rehearsal @relation(fields: [rehearsalId], references: [id], onDelete: Cascade)
+  member   Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([rehearsalId, memberId])
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  title     String
+  startsAt  DateTime
+  location  String
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventMembers EventMember[]
+}
+
+model EventMember {
+  id       String  @id @default(uuid())
+  eventId  String
+  memberId String
+  role     String? // z. B. "Solist", "Begleitung"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, memberId])
+}
+
+model SheetMusic {
+  id         String  @id @default(uuid())
+  title      String
+  composer   String?
+  genre      String?
+  difficulty String? // LEICHT | MITTEL | SCHWER
+  storage    String?
+  fileUrl    String?
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
