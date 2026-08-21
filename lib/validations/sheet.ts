@@ -11,4 +11,7 @@ export const sheetCreateSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const sheetUpdateSchema = sheetCreateSchema.partial();
+
 export type SheetCreateInput = z.infer<typeof sheetCreateSchema>;
+export type SheetUpdateInput = z.infer<typeof sheetUpdateSchema>;
