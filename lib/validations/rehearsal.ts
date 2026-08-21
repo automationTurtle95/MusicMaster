@@ -7,4 +7,7 @@ export const rehearsalCreateSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const rehearsalUpdateSchema = rehearsalCreateSchema.partial();
+
 export type RehearsalCreateInput = z.infer<typeof rehearsalCreateSchema>;
+export type RehearsalUpdateInput = z.infer<typeof rehearsalUpdateSchema>;
