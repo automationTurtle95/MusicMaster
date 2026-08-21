@@ -8,7 +8,7 @@ Von Lukas geliefertes Design-Mockup für MusicMaster. Soll als visuelle Referenz
 
 ## Gezeigt im Dashboard-Screenshot
 
-- Sidebar-Navigation: Dashboard, Probenplan, Mitglieder, Notenarchiv (+ neu: Instrumente, siehe LUH-121)
+- Sidebar-Navigation: Dashboard, Probenplan, Mitglieder, Notenarchiv (+ neu: Instrumente, siehe LUH-125)
 - Header: Begrüßung mit Nutzername, "Exportieren" + "Termin anlegen"-Buttons
 - Kennzahlen-Kacheln: Aktive Mitglieder, Ø Anwesenheit, Offene Beiträge, Tage bis Jahreskonzert
 - "Nächste Gesamtprobe"-Widget mit Zu-/Absagen-Zähler
