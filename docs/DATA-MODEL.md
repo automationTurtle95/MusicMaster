@@ -42,7 +42,7 @@ Skizze der Kernentitäten für den MVP. Finale Felder werden im Scaffold in
 
 *Unique(rehearsalId, memberId).*
 
-### Event (Auftritt)
+### Event (Auftritt) *(implementiert in LUH-70)*
 | Feld      | Typ       | Anmerkung |
 |-----------|-----------|-----------|
 | id        | UUID      | PK |
@@ -51,7 +51,7 @@ Skizze der Kernentitäten für den MVP. Finale Felder werden im Scaffold in
 | location  | String    | |
 | notes     | String?   | |
 
-### EventMember (Besetzung)
+### EventMember (Besetzung) *(implementiert in LUH-70)*
 | Feld      | Typ       | Anmerkung |
 |-----------|-----------|-----------|
 | id        | UUID      | PK |
@@ -61,17 +61,25 @@ Skizze der Kernentitäten für den MVP. Finale Felder werden im Scaffold in
 
 *Unique(eventId, memberId).*
 
-### SheetMusic (Noten)
+### SheetMusic (Noten) — Issue LUH-71
 | Feld       | Typ       | Anmerkung |
 |------------|-----------|-----------|
 | id         | UUID      | PK |
 | title      | String    | |
 | composer   | String?   | |
 | genre      | String?   | |
-| difficulty | Enum?     | LEICHT / MITTEL / SCHWER |
+| difficulty | Enum?     | LEICHT / MITTEL / SCHWER (als String validiert) |
 | storage    | String?   | Ort/Lager (z. B. "Regal A3") |
 | fileUrl    | String?   | Upload-Link (später) |
 | notes      | String?   | |
+
+**Storage-Strategie (MVP, Stand LUH-71):** Im MVP wird bewusst **kein**
+Datei-Upload realisiert. Noten werden rein katalogisch erfasst: `storage`
+hält einen menschenlesbaren Lagerort (Regal/Fach), `fileUrl` ist ein
+optionales freies Referenzfeld (z. B. externer Link). Eine S3-kompatible
+Objektspeicher-Strategie ist als spätere Ausbaustufe vorgesehen und ändert
+das Datenmodell dann nur um ein Pflicht-`fileUrl`/Bucket-Feld – das
+`storage`-Feld bleibt für den physischen Lagerort erhalten.
 
 ### Account / User (Auth)
 | Feld      | Typ       | Anmerkung |
