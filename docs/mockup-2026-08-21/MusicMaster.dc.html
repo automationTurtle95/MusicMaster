@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0}
+body{background:#efe9dc;color:#1e1a15;font-family:Archivo,"Helvetica Neue",Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#b06a17;text-decoration:none}
+a:hover{color:#8c5211}
+::selection{background:#f0dcc0}
+</style>
+</helmet>
+<div style="display:flex;flex-direction:column;min-height:100vh;background:#efe9dc">
+
+<sc-if value="{{ navTop }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:32px;padding:0 28px;height:64px;background:#fbf8f1;border-bottom:1px solid #ded4c1;position:sticky;top:0;z-index:20">
+<div style="display:flex;align-items:baseline;gap:9px">
+<span style="font-size:18px;font-weight:700;letter-spacing:-0.02em">MusicMaster</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8d8474;text-transform:uppercase;letter-spacing:0.08em">Vereinsplaner</span>
+</div>
+<div style="display:flex;gap:4px;flex:1">
+<sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
+<button onClick="{{ item.go }}" style="display:flex;align-items:center;gap:8px;padding:8px 13px;border:none;border-radius:7px;background:{{ item.bg }};color:{{ item.color }};font-family:Archivo,sans-serif;font-size:13.5px;font-weight:{{ item.weight }};cursor:pointer" style-hover="background:#f2e7d5;color:#1e1a15">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;opacity:0.55">{{ item.num }}</span>{{ item.label }}
+</button>
+</sc-for>
+</div>
+<div style="display:flex;align-items:center;gap:14px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8d8474">MV Eichenau</span>
+<div style="width:32px;height:32px;border-radius:50%;background:#b06a17;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:600">HB</div>
+</div>
+</div>
+</sc-if>
+
+<div style="display:flex;flex:1;align-items:stretch">
+
+<sc-if value="{{ navSide }}" hint-placeholder-val="{{ true }}">
+<div style="width:236px;flex:none;background:#fbf8f1;border-right:1px solid #ded4c1;display:flex;flex-direction:column;padding:26px 16px 20px">
+<div style="padding:0 10px 26px">
+<div style="font-size:19px;font-weight:700;letter-spacing:-0.02em;line-height:1">MusicMaster</div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8d8474;text-transform:uppercase;letter-spacing:0.09em;margin-top:7px">Musikverein Eichenau</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:3px">
+<sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
+<button onClick="{{ item.go }}" style="display:flex;align-items:center;gap:11px;width:100%;padding:10px 11px;border:none;border-left:3px solid {{ item.rail }};border-radius:0 7px 7px 0;background:{{ item.bg }};color:{{ item.color }};font-family:Archivo,sans-serif;font-size:14px;font-weight:{{ item.weight }};text-align:left;cursor:pointer" style-hover="background:#f2e7d5;color:#1e1a15">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;opacity:0.5">{{ item.num }}</span>{{ item.label }}
+<span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#a89e8c">{{ item.badge }}</span>
+</button>
+</sc-for>
+</div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
+<div style="padding:13px;border:1px solid #e5dcca;border-radius:9px;background:#f6efe1">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">Saison</div>
+<div style="font-size:14px;font-weight:600;margin-top:5px">2026 / 27</div>
+<div style="font-size:12px;color:#6b6155;margin-top:2px">Woche 34 von 52</div>
+<div style="height:4px;border-radius:2px;background:#e2d7c2;margin-top:9px;overflow:hidden"><div style="width:65%;height:100%;background:#b06a17"></div></div>
+</div>
+<div style="display:flex;align-items:center;gap:10px;padding:0 4px">
+<div style="width:31px;height:31px;flex:none;border-radius:50%;background:#b06a17;color:#fff;display:grid;place-items:center;font-size:11.5px;font-weight:600">HB</div>
+<div style="min-width:0">
+<div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Helmut Brandner</div>
+<div style="font-size:11px;color:#8d8474">Vorstand</div>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:30px 34px 22px;border-bottom:1px solid #e2d9c7">
+<div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#9a9080">{{ crumb }}</div>
+<h1 style="margin:8px 0 0;font-size:30px;font-weight:700;letter-spacing:-0.025em;line-height:1">{{ title }}</h1>
+<p style="margin:8px 0 0;font-size:13.5px;color:#6b6155;max-width:56ch;text-wrap:pretty">{{ subtitle }}</p>
+</div>
+<div style="display:flex;gap:9px;flex:none">
+<button style="padding:9px 14px;border:1px solid #ded4c1;border-radius:7px;background:#fbf8f1;font-family:Archivo,sans-serif;font-size:13px;font-weight:500;color:#3d372e;cursor:pointer" style-hover="background:#f2e7d5">Exportieren</button>
+<button style="padding:9px 15px;border:1px solid #b06a17;border-radius:7px;background:#b06a17;font-family:Archivo,sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer" style-hover="background:#96580f">{{ primaryAction }}</button>
+</div>
+</div>
+
+<sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+<div style="padding:26px 34px 40px;display:flex;flex-direction:column;gap:22px">
+
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+<sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+<div style="padding:17px 18px;background:#fbf8f1;border:1px solid #e2d9c7;border-radius:10px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.1em;text-transform:uppercase;color:#9a9080">{{ k.label }}</div>
+<div style="display:flex;align-items:baseline;gap:7px;margin-top:11px">
+<span style="font-size:29px;font-weight:700;letter-spacing:-0.03em;line-height:1">{{ k.value }}</span>
+<span style="font-size:12px;font-weight:500;color:{{ k.deltaColor }}">{{ k.delta }}</span>
+</div>
+<div style="font-size:12px;color:#6b6155;margin-top:7px">{{ k.note }}</div>
+</div>
+</sc-for>
+</div>
+
+<div style="display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;align-items:start">
+
+<div style="display:flex;flex-direction:column;gap:18px">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:15px 19px;border-bottom:1px solid #ece3d3;background:#f6efe1">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="width:7px;height:7px;border-radius:50%;background:#b06a17"></span>
+<span style="font-size:14px;font-weight:600">Nächste Gesamtprobe</span>
+</div>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8d8474">Mi 02.09. · 19:30</span>
+</div>
+<div style="padding:19px;display:flex;gap:26px;align-items:center">
+<div style="flex:none;text-align:center;padding:12px 18px;border:1px solid #e2d9c7;border-radius:9px;background:#fff">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;color:#9a9080">SEP</div>
+<div style="font-size:32px;font-weight:700;line-height:1.05;letter-spacing:-0.03em">02</div>
+</div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;gap:22px;flex-wrap:wrap">
+<sc-for list="{{ rsvp }}" as="r" hint-placeholder-count="3">
+<div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">{{ r.label }}</div>
+<div style="font-size:20px;font-weight:600;margin-top:4px;color:{{ r.color }}">{{ r.value }}</div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;height:7px;border-radius:4px;overflow:hidden;margin-top:14px;background:#ece3d3">
+<div style="width:76%;background:#4f7a52"></div>
+<div style="width:9%;background:#a13b2f"></div>
+</div>
+<div style="font-size:12px;color:#6b6155;margin-top:9px">Vereinsheim, Probesaal · Programm: Jahreskonzert-Block II</div>
+</div>
+<button onClick="{{ goProben }}" style="flex:none;align-self:flex-start;padding:8px 13px;border:1px solid #ded4c1;border-radius:7px;background:#fff;font-family:Archivo,sans-serif;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="background:#f2e7d5">Öffnen</button>
+</div>
+</div>
+
+<sc-if value="{{ showChart }}" hint-placeholder-val="{{ true }}">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;padding:19px">
+<div style="display:flex;align-items:baseline;justify-content:space-between">
+<span style="font-size:14px;font-weight:600">Besetzung nach Register</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9a9080">Soll / Ist</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:11px;margin-top:17px">
+<sc-for list="{{ register }}" as="r" hint-placeholder-count="7">
+<div style="display:flex;align-items:center;gap:13px">
+<span style="width:104px;flex:none;font-size:12.5px;color:#3d372e">{{ r.name }}</span>
+<div style="flex:1;height:20px;background:#f0e8d8;border-radius:4px;position:relative;overflow:hidden">
+<div style="position:absolute;left:0;top:0;bottom:0;width:{{ r.pct }};background:{{ r.color }};border-radius:4px"></div>
+</div>
+<span style="width:52px;flex:none;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#6b6155">{{ r.ratio }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:18px">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;overflow:hidden">
+<div style="padding:14px 18px;border-bottom:1px solid #ece3d3;font-size:14px;font-weight:600">Anstehende Termine</div>
+<div style="display:flex;flex-direction:column">
+<sc-for list="{{ upcoming }}" as="e" hint-placeholder-count="5">
+<button onClick="{{ e.go }}" style="display:flex;align-items:center;gap:13px;padding:13px 18px;border:none;border-top:1px solid #f0e8d8;background:transparent;text-align:left;cursor:pointer;font-family:Archivo,sans-serif" style-hover="background:#f6efe1">
+<span style="flex:none;width:40px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9a9080">{{ e.date }}</span>
+<span style="flex:none;width:3px;height:26px;border-radius:2px;background:{{ e.color }}"></span>
+<span style="flex:1;min-width:0">
+<span style="display:block;font-size:13.5px;font-weight:500;color:#1e1a15">{{ e.title }}</span>
+<span style="display:block;font-size:11.5px;color:#8d8474;margin-top:2px">{{ e.meta }}</span>
+</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;padding:18px">
+<div style="font-size:14px;font-weight:600">Zu erledigen</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+<sc-for list="{{ todos }}" as="t" hint-placeholder-count="3">
+<div style="display:flex;gap:11px;align-items:flex-start;padding-bottom:10px;border-bottom:1px solid #f0e8d8">
+<span style="flex:none;margin-top:3px;width:14px;height:14px;border:1.5px solid #c9bda6;border-radius:4px"></span>
+<span style="flex:1">
+<span style="display:block;font-size:13px;color:#1e1a15">{{ t.text }}</span>
+<span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:{{ t.color }};margin-top:3px">{{ t.due }}</span>
+</span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isProben }}" hint-placeholder-val="{{ false }}">
+<div style="padding:24px 34px 40px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #ece3d3">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="font-size:16px;font-weight:600">September 2026</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9a9080">8 Termine</span>
+</div>
+<div style="display:flex;gap:5px">
+<sc-for list="{{ legend }}" as="l" hint-placeholder-count="4">
+<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:20px;background:{{ l.bg }};font-size:11px;color:#3d372e">
+<span style="width:6px;height:6px;border-radius:50%;background:{{ l.color }}"></span>{{ l.label }}
+</span>
+</sc-for>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-bottom:1px solid #ece3d3">
+<sc-for list="{{ weekdays }}" as="d" hint-placeholder-count="7">
+<div style="padding:9px 11px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#9a9080">{{ d }}</div>
+</sc-for>
+</div>
+<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr))">
+<sc-for list="{{ cells }}" as="c" hint-placeholder-count="35">
+<button onClick="{{ c.go }}" style="min-height:92px;display:flex;flex-direction:column;gap:5px;padding:8px;border:none;border-right:1px solid #f0e8d8;border-bottom:1px solid #f0e8d8;background:{{ c.bg }};text-align:left;cursor:pointer;font-family:Archivo,sans-serif" style-hover="background:#f6efe1">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:{{ c.numColor }};font-weight:{{ c.numWeight }}">{{ c.day }}</span>
+<sc-for list="{{ c.events }}" as="ev" hint-placeholder-count="1">
+<span style="display:block;padding:3px 6px;border-radius:4px;border-left:2px solid {{ ev.color }};background:{{ ev.bg }};font-size:10.5px;line-height:1.25;color:#3d372e;overflow:hidden">{{ ev.label }}</span>
+</sc-for>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;overflow:hidden">
+<div style="padding:15px 18px;background:#f6efe1;border-bottom:1px solid #ece3d3">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#9a9080">{{ sel.kind }}</div>
+<div style="font-size:17px;font-weight:600;margin-top:6px;letter-spacing:-0.015em">{{ sel.title }}</div>
+<div style="font-size:12.5px;color:#6b6155;margin-top:4px">{{ sel.when }} · {{ sel.place }}</div>
+</div>
+<div style="padding:17px 18px;display:flex;flex-direction:column;gap:16px">
+<div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">Rückmeldungen</div>
+<div style="display:flex;gap:18px;margin-top:9px">
+<sc-for list="{{ sel.rsvp }}" as="r" hint-placeholder-count="3">
+<div><div style="font-size:19px;font-weight:600;color:{{ r.color }}">{{ r.value }}</div><div style="font-size:11.5px;color:#8d8474">{{ r.label }}</div></div>
+</sc-for>
+</div>
+</div>
+<div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">Programm</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:9px">
+<sc-for list="{{ sel.program }}" as="p" hint-placeholder-count="3">
+<div style="display:flex;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px solid #f0e8d8">
+<span style="font-size:13px">{{ p.title }}</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9a9080">{{ p.min }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">Abmeldungen</div>
+<div style="display:flex;flex-direction:column;gap:9px;margin-top:9px">
+<sc-for list="{{ sel.absent }}" as="a" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:9px">
+<span style="width:24px;height:24px;flex:none;border-radius:50%;background:#f0e8d8;display:grid;place-items:center;font-size:10px;font-weight:600;color:#6b6155">{{ a.initials }}</span>
+<span style="font-size:12.5px">{{ a.name }}</span>
+<span style="margin-left:auto;font-size:11.5px;color:#8d8474">{{ a.reason }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<button style="padding:10px;border:1px solid #b06a17;border-radius:7px;background:#b06a17;color:#fff;font-family:Archivo,sans-serif;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#96580f">Anwesenheit erfassen</button>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMembers }}" hint-placeholder-val="{{ false }}">
+<div style="padding:22px 34px 40px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #ded4c1;border-radius:7px;background:#fbf8f1;min-width:230px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#a89e8c">/</span>
+<span style="font-size:13px;color:#a89e8c">Name, Register, Stimme …</span>
+</div>
+<sc-for list="{{ filters }}" as="f" hint-placeholder-count="5">
+<button onClick="{{ f.go }}" style="padding:8px 13px;border:1px solid {{ f.border }};border-radius:20px;background:{{ f.bg }};color:{{ f.color }};font-family:Archivo,sans-serif;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="border-color:#c9bda6">{{ f.label }}</button>
+</sc-for>
+<span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8d8474">{{ memberCount }}</span>
+</div>
+
+<div style="display:grid;grid-template-columns:minmax(0,1fr) {{ drawerCol }};gap:18px;align-items:start">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;overflow:hidden">
+<div style="display:grid;grid-template-columns:2.1fr 1.3fr 1fr 0.9fr 1fr 0.8fr;gap:12px;padding:11px 18px;background:#f6efe1;border-bottom:1px solid #ece3d3;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">
+<span>Mitglied</span><span>Register</span><span>Stimme</span><span>Eintritt</span><span>Beitrag</span><span style="text-align:right">Anwes.</span>
+</div>
+<sc-for list="{{ members }}" as="m" hint-placeholder-count="10">
+<button onClick="{{ m.go }}" style="display:grid;grid-template-columns:2.1fr 1.3fr 1fr 0.9fr 1fr 0.8fr;gap:12px;align-items:center;width:100%;padding:{{ rowPad }} 18px;border:none;border-bottom:1px solid #f0e8d8;background:{{ m.bg }};text-align:left;cursor:pointer;font-family:Archivo,sans-serif" style-hover="background:#f6efe1">
+<span style="display:flex;align-items:center;gap:11px;min-width:0">
+<span style="width:29px;height:29px;flex:none;border-radius:50%;background:{{ m.avBg }};color:{{ m.avColor }};display:grid;place-items:center;font-size:11px;font-weight:600">{{ m.initials }}</span>
+<span style="min-width:0">
+<span style="display:block;font-size:13.5px;font-weight:500;color:#1e1a15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+<span style="display:block;font-size:11px;color:#8d8474">{{ m.role }}</span>
+</span>
+</span>
+<span style="font-size:13px;color:#3d372e">{{ m.register }}</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b6155">{{ m.voice }}</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b6155">{{ m.since }}</span>
+<span><span style="display:inline-block;padding:3px 9px;border-radius:20px;background:{{ m.payBg }};color:{{ m.payColor }};font-size:11.5px;font-weight:500">{{ m.pay }}</span></span>
+<span style="display:flex;align-items:center;gap:8px;justify-content:flex-end">
+<span style="width:34px;height:4px;border-radius:2px;background:#ece3d3;overflow:hidden"><span style="display:block;width:{{ m.attPct }};height:100%;background:{{ m.attColor }}"></span></span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#6b6155">{{ m.att }}</span>
+</span>
+</button>
+</sc-for>
+</div>
+
+<sc-if value="{{ member }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;overflow:hidden;position:sticky;top:20px">
+<div style="padding:18px;background:#f6efe1;border-bottom:1px solid #ece3d3;display:flex;gap:13px;align-items:flex-start">
+<span style="width:44px;height:44px;flex:none;border-radius:50%;background:#b06a17;color:#fff;display:grid;place-items:center;font-size:15px;font-weight:600">{{ member.initials }}</span>
+<span style="flex:1;min-width:0">
+<span style="display:block;font-size:16.5px;font-weight:600;letter-spacing:-0.015em">{{ member.name }}</span>
+<span style="display:block;font-size:12.5px;color:#6b6155;margin-top:3px">{{ member.register }} · {{ member.voice }} · seit {{ member.since }}</span>
+</span>
+<button onClick="{{ closeMember }}" style="flex:none;width:26px;height:26px;border:1px solid #ded4c1;border-radius:6px;background:#fff;color:#6b6155;font-size:13px;line-height:1;cursor:pointer" style-hover="background:#f2e7d5">×</button>
+</div>
+<div style="padding:17px 18px;display:flex;flex-direction:column;gap:16px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<sc-for list="{{ member.stats }}" as="s" hint-placeholder-count="4">
+<div style="padding:11px 12px;border:1px solid #ece3d3;border-radius:8px;background:#fff">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">{{ s.label }}</div>
+<div style="font-size:16px;font-weight:600;margin-top:5px">{{ s.value }}</div>
+</div>
+</sc-for>
+</div>
+<div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">Kontakt</div>
+<div style="display:flex;flex-direction:column;gap:7px;margin-top:9px">
+<div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#8d8474">E-Mail</span><span>{{ member.mail }}</span></div>
+<div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#8d8474">Telefon</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">{{ member.phone }}</span></div>
+<div style="display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#8d8474">Instrument</span><span>{{ member.instrument }}</span></div>
+</div>
+</div>
+<div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">Letzte Proben</div>
+<div style="display:flex;gap:5px;margin-top:10px">
+<sc-for list="{{ member.streak }}" as="s" hint-placeholder-count="10">
+<span style="flex:1;height:26px;border-radius:4px;background:{{ s.color }}"></span>
+</sc-for>
+</div>
+<div style="font-size:11.5px;color:#8d8474;margin-top:8px">{{ member.streakNote }}</div>
+</div>
+<div style="display:flex;gap:8px">
+<button style="flex:1;padding:9px;border:1px solid #ded4c1;border-radius:7px;background:#fff;font-family:Archivo,sans-serif;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="background:#f2e7d5">Nachricht</button>
+<button style="flex:1;padding:9px;border:1px solid #b06a17;border-radius:7px;background:#b06a17;color:#fff;font-family:Archivo,sans-serif;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#96580f">Bearbeiten</button>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isNoten }}" hint-placeholder-val="{{ false }}">
+<div style="padding:22px 34px 40px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+<sc-for list="{{ genres }}" as="g" hint-placeholder-count="5">
+<button onClick="{{ g.go }}" style="padding:8px 13px;border:1px solid {{ g.border }};border-radius:20px;background:{{ g.bg }};color:{{ g.color }};font-family:Archivo,sans-serif;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="border-color:#c9bda6">{{ g.label }}</button>
+</sc-for>
+<div style="margin-left:auto;display:flex;border:1px solid #ded4c1;border-radius:7px;overflow:hidden">
+<button onClick="{{ setGrid }}" style="padding:7px 14px;border:none;background:{{ gridBg }};color:{{ gridColor }};font-family:Archivo,sans-serif;font-size:12.5px;font-weight:500;cursor:pointer">Karten</button>
+<button onClick="{{ setList }}" style="padding:7px 14px;border:none;border-left:1px solid #ded4c1;background:{{ listBg }};color:{{ listColor }};font-family:Archivo,sans-serif;font-size:12.5px;font-weight:500;cursor:pointer">Liste</button>
+</div>
+</div>
+
+<sc-if value="{{ notenGrid }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:15px">
+<sc-for list="{{ pieces }}" as="p" hint-placeholder-count="9">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;overflow:hidden;display:flex;flex-direction:column">
+<div style="height:104px;background:{{ p.tint }};border-bottom:1px solid #ece3d3;position:relative;display:flex;align-items:flex-end;padding:12px">
+<svg width="100%" height="104" viewBox="0 0 240 104" preserveAspectRatio="none" style="position:absolute;inset:0;opacity:0.35">
+<defs><pattern id="{{ p.patternId }}" width="8" height="8" patternTransform="rotate(35)" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="none"></rect><line x1="0" y1="0" x2="0" y2="8" stroke="#b7a98e" stroke-width="1.2"></line></pattern></defs>
+<rect width="240" height="104" fill="{{ p.patternFill }}"></rect>
+</svg>
+<span style="position:relative;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7a6f5c">{{ p.genre }}</span>
+</div>
+<div style="padding:15px;display:flex;flex-direction:column;gap:10px;flex:1">
+<div>
+<div style="font-size:14.5px;font-weight:600;letter-spacing:-0.01em;line-height:1.25">{{ p.title }}</div>
+<div style="font-size:12px;color:#6b6155;margin-top:3px">{{ p.composer }}</div>
+</div>
+<div style="display:flex;gap:14px;margin-top:auto">
+<span>
+<span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">Stufe</span>
+<span style="display:block;font-size:12.5px;font-weight:500;margin-top:3px">{{ p.grade }}</span>
+</span>
+<span>
+<span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">Dauer</span>
+<span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:12px;margin-top:3px">{{ p.dur }}</span>
+</span>
+<span style="margin-left:auto;align-self:flex-end;padding:3px 9px;border-radius:20px;background:{{ p.statusBg }};color:{{ p.statusColor }};font-size:11px;font-weight:500">{{ p.status }}</span>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ notenList }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px solid #e2d9c7;border-radius:11px;background:#fbf8f1;overflow:hidden">
+<div style="display:grid;grid-template-columns:2.4fr 1.6fr 1fr 0.7fr 0.7fr 1fr;gap:12px;padding:11px 18px;background:#f6efe1;border-bottom:1px solid #ece3d3;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:#9a9080">
+<span>Titel</span><span>Komponist</span><span>Gattung</span><span>Stufe</span><span>Dauer</span><span>Status</span>
+</div>
+<sc-for list="{{ pieces }}" as="p" hint-placeholder-count="9">
+<div style="display:grid;grid-template-columns:2.4fr 1.6fr 1fr 0.7fr 0.7fr 1fr;gap:12px;align-items:center;padding:{{ rowPad }} 18px;border-bottom:1px solid #f0e8d8">
+<span style="font-size:13.5px;font-weight:500">{{ p.title }}</span>
+<span style="font-size:13px;color:#3d372e">{{ p.composer }}</span>
+<span style="font-size:12.5px;color:#6b6155">{{ p.genre }}</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b6155">{{ p.grade }}</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b6155">{{ p.dur }}</span>
+<span><span style="display:inline-block;padding:3px 9px;border-radius:20px;background:{{ p.statusBg }};color:{{ p.statusColor }};font-size:11.5px;font-weight:500">{{ p.status }}</span></span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+</div>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;navLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;sidebar&quot;,&quot;topbar&quot;],&quot;default&quot;:&quot;sidebar&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;balanced&quot;,&quot;dense&quot;],&quot;default&quot;:&quot;balanced&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;showRegisterChart&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Dashboard&quot;}}">
+const ACC = "#b06a17", GRN = "#4f7a52", RED = "#a13b2f", INK = "#1e1a15", MUT = "#6b6155";
+
+class Component extends DCLogic {
+  state = { screen: "dashboard", day: 2, memberId: null, filter: "Alle", genre: "Alle", notenView: "grid" };
+
+  go(screen) { return () => this.setState({ screen }); }
+
+  cal() {
+    const ev = {
+      2: [{ label: "Gesamtprobe 19:30", kind: "probe" }],
+      7: [{ label: "Register Holz 19:00", kind: "register" }],
+      9: [{ label: "Gesamtprobe 19:30", kind: "probe" }],
+      10: [{ label: "Vorstandssitzung", kind: "sitzung" }],
+      12: [{ label: "Marschprobe 10:00", kind: "register" }],
+      14: [{ label: "Register Blech 19:00", kind: "register" }],
+      16: [{ label: "Gesamtprobe 19:30", kind: "probe" }],
+      23: [{ label: "Gesamtprobe 19:30", kind: "probe" }],
+      26: [{ label: "Jahreskonzert 19:00", kind: "auftritt" }],
+      30: [{ label: "Gesamtprobe 19:30", kind: "probe" }]
+    };
+    const col = { probe: ACC, register: "#7a6f9c", sitzung: "#8d8474", auftritt: GRN };
+    const bg = { probe: "#f6ead9", register: "#eeecf5", sitzung: "#f0ece4", auftritt: "#e9f0e8" };
+    const cells = [];
+    for (let i = 0; i < 35; i++) {
+      const d = i - 0; // Sept 1 2026 = Tuesday -> index 1 (Mon-first)
+      const day = i;
+      const inMonth = day >= 1 && day <= 30;
+      const sel = inMonth && day === this.state.day;
+      const events = (inMonth && ev[day] ? ev[day] : []).map(e => ({
+        label: e.label, color: col[e.kind], bg: bg[e.kind]
+      }));
+      cells.push({
+        day: inMonth ? String(day).padStart(2, "0") : (day <= 0 ? String(31 + day) : String(day - 30)),
+        bg: sel ? "#f6ead9" : "transparent",
+        numColor: inMonth ? (sel ? ACC : MUT) : "#c3b8a4",
+        numWeight: sel ? 600 : 400,
+        events,
+        go: inMonth ? () => this.setState({ day }) : () => {}
+      });
+    }
+    return cells;
+  }
+
+  selEvent() {
+    const map = {
+      2: { kind: "Gesamtprobe", title: "Gesamtprobe – Jahreskonzert Block II", when: "Mi 02.09., 19:30–21:30", place: "Vereinsheim, Probesaal",
+           rsvp: [["Zugesagt", 52, GRN], ["Abgemeldet", 6, RED], ["Offen", 10, MUT]],
+           program: [["Egerländer Musikantenmarsch", "4:10"], ["Böhmischer Traum", "3:40"], ["Concerto d'Amore", "8:20"], ["Alte Kameraden", "3:30"]],
+           absent: [["Sabine Reiter", "Beruflich"], ["Michael Aigner", "Krank"], ["Lena Hofmann", "Urlaub"]] },
+      7: { kind: "Registerprobe", title: "Registerprobe Holz", when: "Mo 07.09., 19:00–20:30", place: "Vereinsheim, Raum 2",
+           rsvp: [["Zugesagt", 18, GRN], ["Abgemeldet", 2, RED], ["Offen", 3, MUT]],
+           program: [["Concerto d'Amore – Satz 2", "4:00"], ["Intonation & Register", "20:00"]],
+           absent: [["Anna Gruber", "Studium"], ["Tobias Lang", "Krank"]] },
+      26: { kind: "Auftritt", title: "Jahreskonzert 2026", when: "Sa 26.09., 19:00", place: "Gemeindehalle Eichenau",
+           rsvp: [["Zugesagt", 61, GRN], ["Abgemeldet", 3, RED], ["Offen", 4, MUT]],
+           program: [["Festliche Ouvertüre", "6:30"], ["Concerto d'Amore", "8:20"], ["Highlights aus Carmen", "9:10"], ["Zugabe: Böhmische Liebe", "3:20"]],
+           absent: [["Michael Aigner", "Krank"], ["Julia Sauer", "Auswärts"]] }
+    };
+    const d = this.state.day;
+    const e = map[d] || { kind: "Kein Termin", title: "Freier Tag", when: "September " + String(d).padStart(2, "0") + ", 2026", place: "—", rsvp: [["Zugesagt", "–", MUT], ["Abgemeldet", "–", MUT], ["Offen", "–", MUT]], program: [], absent: [] };
+    return {
+      kind: e.kind, title: e.title, when: e.when, place: e.place,
+      rsvp: e.rsvp.map(r => ({ label: r[0], value: r[1], color: r[2] })),
+      program: e.program.map(p => ({ title: p[0], min: p[1] })),
+      absent: e.absent.map(a => ({ name: a[0], reason: a[1], initials: a[0].split(" ").map(s => s[0]).join("") }))
+    };
+  }
+
+  memberData() {
+    return [
+      ["Anna Gruber", "Klarinette", "1. Stimme", "2011", "Bezahlt", 96, "Registerführerin", "anna.gruber@mail.de", "0176 2244881", "Buffet R13"],
+      ["Michael Aigner", "Trompete", "2. Stimme", "2004", "Bezahlt", 71, "", "m.aigner@mail.de", "0151 9930274", "Yamaha Xeno"],
+      ["Sabine Reiter", "Flöte", "1. Stimme", "2018", "Offen", 84, "", "s.reiter@mail.de", "0170 5518823", "Pearl Quantz"],
+      ["Thomas Berger", "Posaune", "3. Stimme", "1998", "Bezahlt", 92, "Notenwart", "t.berger@mail.de", "0179 3341290", "Thomann TP-33"],
+      ["Lena Hofmann", "Horn", "2. Stimme", "2021", "Bezahlt", 63, "", "l.hofmann@mail.de", "0162 7712004", "Alexander 103"],
+      ["Josef Wimmer", "Tuba", "1. Stimme", "1989", "Befreit", 88, "Ehrenmitglied", "j.wimmer@mail.de", "08141 22987", "Miraphone 291"],
+      ["Katharina Mayr", "Klarinette", "3. Stimme", "2019", "Offen", 79, "", "k.mayr@mail.de", "0157 4420018", "Yamaha YCL-450"],
+      ["Tobias Lang", "Schlagwerk", "—", "2015", "Bezahlt", 91, "", "t.lang@mail.de", "0176 6621100", "Vereinsschlagwerk"],
+      ["Julia Sauer", "Saxophon", "2. Stimme", "2022", "Mahnung", 58, "", "j.sauer@mail.de", "0152 8890043", "Selmer Axos"],
+      ["Franz Huber", "Tenorhorn", "1. Stimme", "2007", "Bezahlt", 87, "Kassier", "f.huber@mail.de", "0171 3320991", "Melton 155"]
+    ].map((m, i) => {
+      const pay = { Bezahlt: ["#e9f0e8", GRN], Offen: ["#f6ead9", "#8c5211"], Mahnung: ["#f7e6e3", RED], Befreit: ["#efece6", MUT] }[m[4]];
+      const att = m[5];
+      return {
+        id: i, name: m[0], register: m[1], voice: m[2], since: m[3], pay: m[4], att: att + "%",
+        role: m[6] || "Mitglied", mail: m[7], phone: m[8], instrument: m[9],
+        initials: m[0].split(" ").map(s => s[0]).join(""),
+        payBg: pay[0], payColor: pay[1],
+        attPct: att + "%", attColor: att >= 85 ? GRN : att >= 70 ? ACC : RED
+      };
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const dense = (this.props.density ?? "balanced") === "dense";
+    const navLayout = this.props.navLayout ?? "sidebar";
+    const side = navLayout === "sidebar";
+
+    const meta = {
+      dashboard: ["Übersicht · Saison 2026/27", "Guten Abend, Helmut", "Alles Wichtige zum Verein auf einen Blick – Proben, Besetzung und offene Aufgaben.", "Termin anlegen"],
+      proben: ["Planung · September 2026", "Probenplan & Termine", "Gesamt- und Registerproben, Auftritte und Sitzungen in einem Kalender.", "Termin anlegen"],
+      mitglieder: ["Verwaltung · 68 Aktive", "Mitgliederverwaltung", "Stammdaten, Register, Beiträge und Anwesenheit der aktiven Musikerinnen und Musiker.", "Mitglied aufnehmen"],
+      noten: ["Archiv · 342 Werke", "Notenarchiv", "Bestand, Verleih und Digitalisierung des Vereinsarchivs.", "Werk erfassen"]
+    }[s.screen];
+
+    const navItems = [["01", "Dashboard", "dashboard", ""], ["02", "Probenplan", "proben", "8"], ["03", "Mitglieder", "mitglieder", "68"], ["04", "Notenarchiv", "noten", "342"]];
+    const nav = navItems.map(n => {
+      const on = s.screen === n[2];
+      return { num: n[0], label: n[1], badge: n[3], go: this.go(n[2]),
+        bg: on ? "#f6ead9" : "transparent", color: on ? INK : "#59513f",
+        weight: on ? 600 : 400, rail: on ? ACC : "transparent" };
+    });
+
+    const member = s.memberId === null ? null : this.memberData()[s.memberId];
+    const memberOut = member ? Object.assign({}, member, {
+      stats: [
+        { label: "Anwesenheit", value: member.att }, { label: "Dienstjahre", value: (2026 - Number(member.since)) + "" },
+        { label: "Beitrag", value: member.pay }, { label: "Fehltage 26", value: "4" }
+      ],
+      streak: [1,1,0,1,1,1,0,1,1,1].map(v => ({ color: v ? GRN : "#f0d6d1" })),
+      streakNote: "8 von 10 letzten Proben anwesend"
+    }) : null;
+
+    const filterOpts = ["Alle", "Holz", "Blech", "Schlagwerk", "Beitrag offen"];
+    const chip = (label, active, go) => ({ label, go,
+      bg: active ? "#f6ead9" : "#fbf8f1", border: active ? "#e0c193" : "#ded4c1", color: active ? "#8c5211" : "#59513f" });
+
+    const genreOpts = ["Alle", "Marsch", "Polka", "Konzertwerk", "Unterhaltung", "Kirchlich"];
+    const pieceData = [
+      ["Egerländer Musikantenmarsch", "Ernst Mosch", "Marsch", "3", "4:10", "Im Umlauf"],
+      ["Böhmischer Traum", "Norbert Gälle", "Polka", "3", "3:40", "Im Umlauf"],
+      ["Concerto d'Amore", "Jacob de Haan", "Konzertwerk", "4", "8:20", "Im Umlauf"],
+      ["Festliche Ouvertüre", "Otto M. Schwarz", "Konzertwerk", "5", "6:30", "Archiv"],
+      ["Alte Kameraden", "Carl Teike", "Marsch", "2", "3:30", "Archiv"],
+      ["Highlights aus Carmen", "arr. Kliment", "Unterhaltung", "4", "9:10", "Verliehen"],
+      ["Deutsche Messe", "Franz Schubert", "Kirchlich", "3", "12:00", "Archiv"],
+      ["Rauschende Birken", "Siegfried Translateur", "Konzertwerk", "3", "5:15", "Archiv"],
+      ["Fürstenfelder Marsch", "Ludwig Rührig", "Marsch", "2", "3:05", "Digitalisierung"]
+    ];
+    const tints = ["#f2ead9", "#eeece3", "#f0e6dc", "#eaeae2"];
+    const pieces = pieceData
+      .filter(p => s.genre === "Alle" || p[2] === s.genre)
+      .map((p, i) => {
+        const st = { "Im Umlauf": ["#e9f0e8", GRN], "Archiv": ["#efece6", MUT], "Verliehen": ["#f6ead9", "#8c5211"], "Digitalisierung": ["#eeecf5", "#5c5480"] }[p[5]];
+        return { title: p[0], composer: p[1], genre: p[2], grade: p[3], dur: p[4], status: p[5],
+          statusBg: st[0], statusColor: st[1], tint: tints[i % 4],
+          patternId: "pt" + i, patternFill: "url(#pt" + i + ")" };
+      });
+
+    const members = this.memberData()
+      .filter(m => {
+        if (s.filter === "Alle") return true;
+        if (s.filter === "Holz") return ["Klarinette", "Flöte", "Saxophon"].includes(m.register);
+        if (s.filter === "Blech") return ["Trompete", "Posaune", "Horn", "Tuba", "Tenorhorn"].includes(m.register);
+        if (s.filter === "Schlagwerk") return m.register === "Schlagwerk";
+        return m.pay === "Offen" || m.pay === "Mahnung";
+      })
+      .map(m => Object.assign({}, m, {
+        go: () => this.setState({ memberId: m.id }),
+        bg: s.memberId === m.id ? "#f6ead9" : "transparent",
+        avBg: s.memberId === m.id ? ACC : "#f0e8d8",
+        avColor: s.memberId === m.id ? "#fff" : MUT
+      }));
+
+    return {
+      navSide: side, navTop: !side, nav,
+      crumb: meta[0], title: meta[1], subtitle: meta[2], primaryAction: meta[3],
+      isDash: s.screen === "dashboard", isProben: s.screen === "proben",
+      isMembers: s.screen === "mitglieder", isNoten: s.screen === "noten",
+      showChart: this.props.showRegisterChart ?? true,
+      rowPad: dense ? "8px" : "13px",
+      goProben: this.go("proben"),
+
+      kpis: [
+        { label: "Aktive Mitglieder", value: "68", delta: "+3", deltaColor: GRN, note: "4 Neuzugänge, 1 Austritt" },
+        { label: "Ø Anwesenheit", value: "84%", delta: "−2", deltaColor: RED, note: "letzte 8 Gesamtproben" },
+        { label: "Offene Beiträge", value: "7", delta: "", deltaColor: MUT, note: "1.260 € ausstehend" },
+        { label: "Bis Jahreskonzert", value: "36", delta: "Tage", deltaColor: MUT, note: "26.09. Gemeindehalle" }
+      ],
+      rsvp: [{ label: "Zugesagt", value: "52", color: GRN }, { label: "Abgemeldet", value: "6", color: RED }, { label: "Offen", value: "10", color: MUT }],
+      register: [
+        ["Klarinette", 14, 16], ["Flöte", 6, 6], ["Trompete", 11, 12], ["Posaune", 7, 9],
+        ["Horn", 5, 8], ["Tenorhorn / Bariton", 6, 6], ["Tuba", 3, 4], ["Schlagwerk", 4, 5]
+      ].map(r => ({ name: r[0], ratio: r[1] + " / " + r[2], pct: Math.round(r[1] / r[2] * 100) + "%",
+        color: r[1] / r[2] >= 0.95 ? GRN : r[1] / r[2] >= 0.75 ? ACC : RED })),
+      upcoming: [
+        ["02.09.", "Gesamtprobe", "19:30 · Probesaal · 52 zugesagt", ACC],
+        ["07.09.", "Registerprobe Holz", "19:00 · Raum 2 · 18 zugesagt", "#7a6f9c"],
+        ["10.09.", "Vorstandssitzung", "20:00 · Nebenzimmer · 7 Personen", "#8d8474"],
+        ["12.09.", "Marschprobe Festzug", "10:00 · Schulhof", "#7a6f9c"],
+        ["26.09.", "Jahreskonzert", "19:00 · Gemeindehalle · Einlass 18:15", GRN]
+      ].map(e => ({ date: e[0], title: e[1], meta: e[2], color: e[3], go: this.go("proben") })),
+      todos: [
+        { text: "Programmheft Jahreskonzert freigeben", due: "fällig in 3 Tagen", color: "#8c5211" },
+        { text: "7 Beitragsmahnungen versenden", due: "überfällig seit 12.08.", color: RED },
+        { text: "Noten „Highlights aus Carmen“ zurückfordern", due: "fällig 28.09.", color: MUT },
+        { text: "GEMA-Meldung Q3 einreichen", due: "fällig 30.09.", color: MUT }
+      ],
+
+      weekdays: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+      legend: [["Gesamtprobe", ACC, "#f6ead9"], ["Register", "#7a6f9c", "#eeecf5"], ["Auftritt", GRN, "#e9f0e8"], ["Sitzung", "#8d8474", "#f0ece4"]]
+        .map(l => ({ label: l[0], color: l[1], bg: l[2] })),
+      cells: this.cal(),
+      sel: this.selEvent(),
+
+      filters: filterOpts.map(f => chip(f, s.filter === f, () => this.setState({ filter: f }))),
+      memberCount: members.length + " von 68 Mitgliedern",
+      members, member: memberOut,
+      drawerCol: memberOut ? "340px" : "0px",
+      closeMember: () => this.setState({ memberId: null }),
+
+      genres: genreOpts.map(g => chip(g, s.genre === g, () => this.setState({ genre: g }))),
+      notenGrid: s.notenView === "grid", notenList: s.notenView === "list",
+      setGrid: () => this.setState({ notenView: "grid" }), setList: () => this.setState({ notenView: "list" }),
+      gridBg: s.notenView === "grid" ? "#f6ead9" : "#fbf8f1", gridColor: s.notenView === "grid" ? "#8c5211" : "#59513f",
+      listBg: s.notenView === "list" ? "#f6ead9" : "#fbf8f1", listColor: s.notenView === "list" ? "#8c5211" : "#59513f",
+      pieces
+    };
+  }
+}
+
+</script>
+</body>
+</html>
