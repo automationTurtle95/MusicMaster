@@ -1,4 +1,5 @@
 import { RehearsalsManager } from "@/components/rehearsals-manager";
+import { RehearsalCalendar } from "@/components/rehearsal-calendar";
 
 export default function RehearsalsPage() {
   return (
@@ -7,6 +8,7 @@ export default function RehearsalsPage() {
       <p className="text-muted-foreground">
         Proben planen und Anwesenheit (da/entschuldigt/fehlt) je Mitglied erfassen.
       </p>
+      <RehearsalCalendar />
       <RehearsalsManager />
     </div>
   );
