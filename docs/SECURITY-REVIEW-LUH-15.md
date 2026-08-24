@@ -129,4 +129,19 @@ Diese Issues sollten – sobald das Board erreichbar ist – angelegt werden:
 | P4 | Pen-Test Auth-Flows | Vor public Launch manuell durchspielen (Login/Reset/CSR). | Niedrig |
 
 **Abgeschlossen:** LUH-151 (Dashboard), LUH-15 (Security-Hardening + A01-Audit), Dev-Tooling-Update (vitest/vite/esbuild → 0 Vuln), CI-Workflow (`.github/workflows/ci.yml`: typecheck/lint/build/test/audit).
+
+## 10. Verifikation der Security-Controls (Review)
+
+Kritische Prüfung, dass die härtenden Maßnahmen nicht nur im Code stehen, sondern **effektiv
+verdrahtet** sind (kein Dead Code):
+
+- **Brute-Force-Schutz:** `lib/rate-limit.ts::rateLimitAllow` ist in `lib/auth.ts` (Credentials-
+  `authorize`, Zeile 40) eingebunden → bei Limitüberschreitung `return null` (Behandlung als
+  falsche Credentials; **kein** Informationsleck bzgl. Rate-Limit-Status). Logik (Fenster 60 s,
+  10 Versuche, In-Memory-Store mit Cleanup bei >5000 Einträgen) geprüft und korrekt.
+- **Security-Header / CSP:** in `next.config.mjs` via `headers()` für `/:path*` gesetzt
+  (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, HSTS).
+  Gelten damit für **alle** Routen inkl. API.
+- **A01 Access-Control:** alle Mutatoren `isManager`-gegated (§8); Reads explizit `auth()`-
+  geprüft. Fazit: Controls sind wirksam, keine Dead-Code-Risiken festgestellt.
 **Nicht mehr erforderlich:** Next.js-16-Upgrade (kein `next`/`sharp`-Vuln mehr offen – siehe §6.6).
