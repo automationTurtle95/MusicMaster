@@ -73,14 +73,10 @@ Für Multi-Instanz/Serverless ist ein Redis-basierter Limiter nachzurüsten (Fol
 1. ~~IDOR-Audit der `:id`-API-Routen~~ → **erledigt**, siehe §8 (A01 🟢 geschlossen).
 2. Verteilter Rate Limiter (Redis) für Produktion (In-Memory reicht für Single-Instance/MVP).
 3. Zentrales Error-Logging/Monitoring (LUH-17 verwandt).
-4. **Dev-Tooling-Update (vitest/vite/esbuild-Kette)** – *eigenes, niedrig priorisiertes Issue*.
-   `npm audit` meldet aktuell **5 Schwachstellen, alle ausschließlich dev-only** (Dev-Server + Test-Runner,
-   nicht im Produktions-Build):
-   - `vitest` **CRITICAL** (Kette esbuild/vite/vite-node/@vitest/mocker)
-   - `vite` **HIGH** – Path Traversal in optimierten Deps `.map`
-   - `esbuild`, `vite-node`, `@vitest/mocker` **MODERATE**
-   Fix: `npm audit fix --force` → `vitest@4` (Breaking Change für die Testsuite). Da prod-relevant **null**,
-   Empfehlung: in ruhigem Moment durchführen, danach `vitest run` + `next build` zur Regression.
+4. ~~Dev-Tooling-Update (vitest/vite/esbuild-Kette)~~ → **erledigt**: `npm audit fix --force` hob
+   `vitest` auf 4.1.11 (Breaking Change), **0 verbleibende Schwachstellen** (`npm audit` clean).
+   Verifiziert: `next build` grün + `vitest run` → 5 Dateien / 21 Tests grün. Prod-Build unbetroffen
+   (dev-only-Kette). Kein next-16-Upgrade nötig (siehe §6.6).
 5. Pen-Test der Auth-Flows vor public Launch.
 6. **Korrektur früherer Einschätzung:** Die Annahme "Next.js-Advistory nur in next 16 schließbar" trifft
    **nicht mehr zu**. Durch das Upgrade auf `next@15.5.23` (Commit e3cdb8f) und die `sharp`/`postcss`-Overrides
@@ -127,10 +123,10 @@ Diese Issues sollten – sobald das Board erreichbar ist – angelegt werden:
 | Prio | Issue | Inhalt | Risiko |
 |------|-------|--------|--------|
 | P2 | **LUH-125** Instrument/Register-Modell | `Instrument`-Modell aus Stash als saubere Migration + Dashboard-Widget "Besetzung nach Register" (aktuell Platzhalter). | Mittel (Schema-Migration, Review nötig) |
-| P3 | Dev-Tooling-Update vitest/vite/esbuild | `npm audit fix --force` → vitest@4, danach `vitest run` + `next build` als Regression. | Niedrig (rein dev-only, prod unbetroffen) |
+| P3 | ~~Dev-Tooling-Update vitest/vite/esbuild~~ **Erledigt** (vitest 4.1.11, 0 Vuln). | — | — |
 | P3 | Verteilter Rate Limiter (Redis) | In-Memory-Limiter durch Redis-Store für Multi-Instance/Serverless ersetzen. | Niedrig |
 | P3 | Zentrales Error-Logging/Monitoring | Strukturiertes Logging (LUH-17 verwandt). | Niedrig |
 | P4 | Pen-Test Auth-Flows | Vor public Launch manuell durchspielen (Login/Reset/CSR). | Niedrig |
 
-**Abgeschlossen:** LUH-151 (Dashboard), LUH-15 (Security-Hardening + A01-Audit).
+**Abgeschlossen:** LUH-151 (Dashboard), LUH-15 (Security-Hardening + A01-Audit), Dev-Tooling-Update (vitest/vite/esbuild → 0 Vuln).
 **Nicht mehr erforderlich:** Next.js-16-Upgrade (kein `next`/`sharp`-Vuln mehr offen – siehe §6.6).
