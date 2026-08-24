@@ -128,5 +128,5 @@ Diese Issues sollten – sobald das Board erreichbar ist – angelegt werden:
 | P3 | Zentrales Error-Logging/Monitoring | Strukturiertes Logging (LUH-17 verwandt). | Niedrig |
 | P4 | Pen-Test Auth-Flows | Vor public Launch manuell durchspielen (Login/Reset/CSR). | Niedrig |
 
-**Abgeschlossen:** LUH-151 (Dashboard), LUH-15 (Security-Hardening + A01-Audit), Dev-Tooling-Update (vitest/vite/esbuild → 0 Vuln).
+**Abgeschlossen:** LUH-151 (Dashboard), LUH-15 (Security-Hardening + A01-Audit), Dev-Tooling-Update (vitest/vite/esbuild → 0 Vuln), CI-Workflow (`.github/workflows/ci.yml`: typecheck/lint/build/test/audit).
 **Nicht mehr erforderlich:** Next.js-16-Upgrade (kein `next`/`sharp`-Vuln mehr offen – siehe §6.6).

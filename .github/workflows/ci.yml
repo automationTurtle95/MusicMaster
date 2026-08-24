@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      # SQLite-Datei für Tests/Build (gleicher Pfad wie in vitest.config.ts).
+      DATABASE_URL: file:./prisma/dev.db
+      # Dummy-Secret nur für CI-Build; in Produktion via Secret-Store setzen.
+      AUTH_SECRET: ci-dummy-secret-not-for-prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Push schema to SQLite (test DB)
+        run: npx prisma db push --skip-generate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test
+
+      - name: Audit (fail on high/critical)
+        run: npm audit --audit-level=high
