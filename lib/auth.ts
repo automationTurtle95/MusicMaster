@@ -28,8 +28,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           request?.headers?.get("x-real-ip") ||
           "unknown";
 
-        // Brute-Force-Schutz: max. 10 Login-Versuche pro IP/Minute.
-        if (!rateLimitAllow(`login:${ip}`)) return null;
+        // Konto aus den Credentials als zweiter Schlüssel: verhindert einen
+        // globalen Lockout, falls x-forwarded-for/x-real-ip fehlt (z. B. direkter
+        // Node-Server ohne Proxy) – sonst teilen ALLE Logins ein Limit.
+        const email =
+          (raw && typeof raw === "object" && "email" in raw
+            ? String((raw as Record<string, unknown>).email ?? "")
+            : "") || "unknown";
+
+        // Brute-Force-Schutz: max. 10 Login-Versuche pro Konto+IP/Minute.
+        if (!rateLimitAllow(`login:${ip}:${email}`)) return null;
 
         const parsed = signInSchema.safeParse(raw);
         if (!parsed.success) return null;

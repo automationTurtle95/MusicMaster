@@ -43,7 +43,7 @@ Ergebnis: **8 Schwachstellen (2 kritisch, 3 hoch, 3 mittel)**.
 ## 3. Security Headers (neu in `next.config.ts`)
 
 Implementiert via `headers()`-Funktion (gelten für alle Routen):
-- `Content-Security-Policy` (strict: default-src 'self', keine inline-Scripts erlaubt außer Next-Bundles)
+- `Content-Security-Policy` (strict: default-src 'self'; script-src 'self' 'unsafe-inline' – Next.js benötigt Inline-Scripts für RSC; `unsafe-eval` bewusst NICHT gesetzt)
 - `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
