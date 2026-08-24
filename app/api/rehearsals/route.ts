@@ -7,6 +7,10 @@ import { rehearsalCreateSchema } from "@/lib/validations/rehearsal";
 
 // GET /api/rehearsals – Liste (chronologisch aufsteigend).
 export async function GET() {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Nicht authentifiziert" }, { status: 401 });
+  }
   const rehearsals = await prisma.rehearsal.findMany({
     orderBy: { startsAt: "asc" },
     include: { _count: { select: { attendances: true } } },

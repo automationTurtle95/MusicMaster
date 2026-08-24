@@ -5,11 +5,15 @@ import { prisma } from "@/lib/prisma";
 import { isManager } from "@/lib/authz";
 import { memberCreateSchema } from "@/lib/validations/member";
 
-// GET /api/members – Liste (geschützt durch Middleware).
+// GET /api/members – Liste (explizit auth-geprüft + Middleware).
 // Voller Datensatz, damit der Edit-Dialog ohne erneuten Fetch alle Felder
 // (Adresse, Telefon, Beitritt, Notizen) korrekt vorbelegen kann – sonst
 // würden beim PATCH nicht gelieferte Felder zu Leerstrings überschrieben.
 export async function GET() {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Nicht authentifiziert" }, { status: 401 });
+  }
   const members = await prisma.member.findMany({
     orderBy: { lastName: "asc" },
   });

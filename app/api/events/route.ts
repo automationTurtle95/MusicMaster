@@ -17,6 +17,10 @@ const eventInclude = {
 
 // GET /api/events – Liste (chronologisch), inkl. Besetzung.
 export async function GET() {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Nicht authentifiziert" }, { status: 401 });
+  }
   const events = await prisma.event.findMany({
     orderBy: { startsAt: "asc" },
     include: eventInclude,

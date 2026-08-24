@@ -29,7 +29,7 @@ Ergebnis: **8 Schwachstellen (2 kritisch, 3 hoch, 3 mittel)**.
 
 | # | Risiko | Status | Befund / Maßnahme |
 |---|--------|--------|-------------------|
-| A01 | Broken Access Control | 🟡 Teilweise | RBAC via `lib/authz.ts` (isAdmin) + Middleware-Auth-Gate vorhanden. API-Routen prüfen Owner/Role (IDOR-Risiko bei `:id`-Routen → Follow-up-Audit empfohlen). |
+| A01 | Broken Access Control | 🟢 | RBAC via `lib/authz.ts` (isManager) + Middleware-Auth-Gate. **Audit der `:id`-Routen (§8):** alle Mutatoren (PATCH/PUT/DELETE) `isManager`-gesichert → kein IDOR/Privilege-Escalation. Reads nun explizit `auth()`-geprüft (Defense-in-Depth). |
 | A02 | Cryptographic Failures | 🟢 | Passwörter via scrypt-gehasht (`lib/password`). `AUTH_SECRET` in `.env.example` bewusst **leer** (in Prod zwingend setzen!). TLS/HSTS via Header (siehe §3). |
 | A03 | Injection | 🟢 | Prisma (parametrisiert) + Zod-Validierung an allen API-Grenzen → SQL/XSS-Injection weitgehend mitigiert. |
 | A04 | Insecure Design | 🟢 | Standard-Auth-Flow (NextAuth v5 Credentials). |
@@ -83,3 +83,28 @@ Für Multi-Instanz/Serverless ist ein Redis-basierter Limiter nachzurüsten (Fol
    (Advistory betrifft v. a. Dev-Server Origin-Verifikation).
 7. `npm audit` meldet nach den Fixes noch 1 kritisch + 1 hoch (beide next/sharp-Metadaten) + 3 moderat
    (esbuild/vite/vitest, **rein dev-only**). Prod-Build nutzt die gepatchten postcss 8.5.26 / sharp 0.35.3.
+
+## 8. A01-Audit der `:id`-Read-/Mutator-Routen (Follow-up)
+
+Ziel: Prüfung auf IDOR / Broken Access Control an allen entitybezogenen API-Routen.
+
+Befund (alle Routen auth-gated via Middleware `/api/*`, nicht-öffentlich):
+
+- **Mutatoren (PATCH/PUT/DELETE)** in `members/[id]`, `events/[id]`, `sheets/[id]`,
+  `rehearsals/[id]`, `rehearsals/[id]/attendance` → alle zwingend `isManager(session?.user?.role)`,
+  sonst `403`. **Kein** IDOR / keine Privilege-Escalation: ein nicht-Manager kann keine
+  Fremddaten schreiben/löschen.
+- **Reads (GET)** in denselben Routen **plus** der Collection-GETs (`/api/members`,
+  `/api/events`, `/api/sheets`, `/api/rehearsals`) verließen sich bisher *allein* auf die
+  Middleware. Funktionell geschützt, aber keine Defense-in-Depth: eine Änderung am Middleware-
+  Matcher/Auth-Gate hätte die Endpunkte stillschweigend freigegeben.
+
+Maßnahme: In **allen** GET-Handlern wurde ein expliziter `auth()`-Check mit `401` bei
+fehlender Session ergänzt (`Nicht authentifiziert`). Verhalten für eingeloggte User unverändert;
+für nicht-authentifizierte Anfragen wird nun sauber `401` statt Redirect/HTML geliefert.
+
+Dateien: `app/api/members/route.ts`, `members/[id]/route.ts`, `events/route.ts`,
+`events/[id]/route.ts`, `sheets/route.ts`, `sheets/[id]/route.ts`, `rehearsals/route.ts`,
+`rehearsals/[id]/route.ts`, `rehearsals/[id]/attendance/route.ts`.
+
+Status A01: **🟢 geschlossen** (RBAC + Defense-in-Depth auf allen Endpunkten).

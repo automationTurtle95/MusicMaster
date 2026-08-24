@@ -9,6 +9,10 @@ import { sheetCreateSchema } from "@/lib/validations/sheet";
 // Voller Datensatz, damit der Detail-/Edit-Dialog ohne erneuten Fetch alle
 // Felder korrekt vorbelegen kann (kein Überschreiben mit Leerstrings beim PATCH).
 export async function GET(request: Request) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Nicht authentifiziert" }, { status: 401 });
+  }
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q")?.trim();
 
