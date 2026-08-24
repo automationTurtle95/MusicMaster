@@ -68,21 +68,32 @@ Für Multi-Instanz/Serverless ist ein Redis-basierter Limiter nachzurüsten (Fol
 - **Action:** In Produktion `AUTH_SECRET` (>=32 Byte, `openssl rand -base64 32`) und ggf.
   `RESEND_API_KEY` zwingend via Secret-Store/Env setzen (nicht committen).
 
-## 6. Verbleibende Empfehlungen (Follow-up, nicht dieser Heartbeat)
+## 6. Verbleibende Empfehlungen / Residuen (Stand: nach next-Upgrade 15.5.23 + Overrides)
 
-1. IDOR-Audit der `:id`-API-Routen (Owner/Role-Checks) – eigenes Issue.
-2. Verteilter Rate Limiter (Redis) für Produktion.
+1. ~~IDOR-Audit der `:id`-API-Routen~~ → **erledigt**, siehe §8 (A01 🟢 geschlossen).
+2. Verteilter Rate Limiter (Redis) für Produktion (In-Memory reicht für Single-Instance/MVP).
 3. Zentrales Error-Logging/Monitoring (LUH-17 verwandt).
-4. Dev-Dependency-Updates (vitest 4) in ruhigem Moment (breaking für Tests).
+4. **Dev-Tooling-Update (vitest/vite/esbuild-Kette)** – *eigenes, niedrig priorisiertes Issue*.
+   `npm audit` meldet aktuell **5 Schwachstellen, alle ausschließlich dev-only** (Dev-Server + Test-Runner,
+   nicht im Produktions-Build):
+   - `vitest` **CRITICAL** (Kette esbuild/vite/vite-node/@vitest/mocker)
+   - `vite` **HIGH** – Path Traversal in optimierten Deps `.map`
+   - `esbuild`, `vite-node`, `@vitest/mocker` **MODERATE**
+   Fix: `npm audit fix --force` → `vitest@4` (Breaking Change für die Testsuite). Da prod-relevant **null**,
+   Empfehlung: in ruhigem Moment durchführen, danach `vitest run` + `next build` zur Regression.
 5. Pen-Test der Auth-Flows vor public Launch.
-6. **Residual (kritisch):** Eine Next.js-Advistory ist erst in **next 16.x** geschlossen. `npm audit fix --force`
-   würde auf next@16.3.2 (Major, breaking) springen. Ein solcher Major-Framework-Sprung wird **nicht**
-   ungeprüft in diesem Heartbeat durchgeführt (Risiko, die laufende App/ Dashboard zu brechen). Empfehlung:
-   dediziertes Issue "Next.js 16 Upgrade (Security)" mit vollständigem Regression-Test (Build + Vitest + manueller
-   Smoke-Test der Auth/Dashboard-Routen) vor public Launch. Bis dahin: Dev-Server nicht öffentlich exponieren
-   (Advistory betrifft v. a. Dev-Server Origin-Verifikation).
-7. `npm audit` meldet nach den Fixes noch 1 kritisch + 1 hoch (beide next/sharp-Metadaten) + 3 moderat
-   (esbuild/vite/vitest, **rein dev-only**). Prod-Build nutzt die gepatchten postcss 8.5.26 / sharp 0.35.3.
+6. **Korrektur früherer Einschätzung:** Die Annahme "Next.js-Advistory nur in next 16 schließbar" trifft
+   **nicht mehr zu**. Durch das Upgrade auf `next@15.5.23` (Commit e3cdb8f) und die `sharp`/`postcss`-Overrides
+   sind **keine** `next`-/ `sharp`-Vuln mehr offen. Ein next-16-Major-Sprung ist somit **nicht**
+   sicherheitskritisch und wird nicht durchgeführt.
+7. **Stale Stash (LUH-111/124/148):** `git stash@{0}` ("WIP prior sessions … before LUH-151 dashboard rebuild",
+   Branch `LUH-111-logout-nav`) enthält u. a. ein `Instrument`-Modell-Experiment (`prisma/schema.prisma` +23)
+   und Dashboard-Komponenten. Dieser Stash ist **vor** dem LUH-151-Dashboard-Rebuild entstanden und konfliktiert
+   massiv mit dem aktuellen `main` (modifiziert `app/(app)/layout.tsx`, `components/nav.tsx` [in LUH-151 gelöscht],
+   `globals.css`). **Nicht** blind mergen – würde das laufende System gefährden. Logout (LUH-111) ist bereits in
+   `main` umgesetzt (`components/dashboard/sidebar.tsx`). Der einzig wiederverwertbare Teil ist das `Instrument`-
+   Modell → als dediziertes Issue **LUH-125** ("Besetzung nach Register") mit sauberer Migration + Review
+   aufnehmen. Stash vorerst erhalten (`git stash` nicht droppen).
 
 ## 8. A01-Audit der `:id`-Read-/Mutator-Routen (Follow-up)
 
@@ -108,3 +119,18 @@ Dateien: `app/api/members/route.ts`, `members/[id]/route.ts`, `events/route.ts`,
 `rehearsals/[id]/route.ts`, `rehearsals/[id]/attendance/route.ts`.
 
 Status A01: **🟢 geschlossen** (RBAC + Defense-in-Depth auf allen Endpunkten).
+
+## 9. Priorisierter technischer Backlog (CTO-Empfehlung)
+
+Diese Issues sollten – sobald das Board erreichbar ist – angelegt werden:
+
+| Prio | Issue | Inhalt | Risiko |
+|------|-------|--------|--------|
+| P2 | **LUH-125** Instrument/Register-Modell | `Instrument`-Modell aus Stash als saubere Migration + Dashboard-Widget "Besetzung nach Register" (aktuell Platzhalter). | Mittel (Schema-Migration, Review nötig) |
+| P3 | Dev-Tooling-Update vitest/vite/esbuild | `npm audit fix --force` → vitest@4, danach `vitest run` + `next build` als Regression. | Niedrig (rein dev-only, prod unbetroffen) |
+| P3 | Verteilter Rate Limiter (Redis) | In-Memory-Limiter durch Redis-Store für Multi-Instance/Serverless ersetzen. | Niedrig |
+| P3 | Zentrales Error-Logging/Monitoring | Strukturiertes Logging (LUH-17 verwandt). | Niedrig |
+| P4 | Pen-Test Auth-Flows | Vor public Launch manuell durchspielen (Login/Reset/CSR). | Niedrig |
+
+**Abgeschlossen:** LUH-151 (Dashboard), LUH-15 (Security-Hardening + A01-Audit).
+**Nicht mehr erforderlich:** Next.js-16-Upgrade (kein `next`/`sharp`-Vuln mehr offen – siehe §6.6).
