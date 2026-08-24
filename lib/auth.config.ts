@@ -1,4 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+import type { Role } from "@/lib/validations/auth";
 
 // Edge-sichere Basis-Konfiguration (kein Prisma/Node-Import!).
 // Wird von der Middleware (Edge-Runtime) genutzt und als Basis für die
@@ -33,11 +35,12 @@ export const authConfig = {
       return token;
     },
     session({ session, token }) {
-      if (token) {
-        session.user.id = token.id ?? session.user.id;
-        session.user.role = token.role ?? "MEMBER";
-        session.user.name = token.name ?? session.user.name;
-        session.user.email = token.email ?? session.user.email;
+      const jwt = token as JWT;
+      if (jwt) {
+        session.user.id = (jwt.id as string | undefined) ?? session.user.id;
+        session.user.role = (jwt.role as Role | undefined) ?? "MEMBER";
+        session.user.name = (jwt.name as string | null | undefined) ?? session.user.name;
+        session.user.email = (jwt.email as string | null | undefined) ?? session.user.email;
       }
       return session;
     },
