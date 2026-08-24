@@ -6,6 +6,7 @@ import authConfig from "@/lib/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/password";
+import { rateLimitAllow } from "@/lib/rate-limit";
 import { Role, signInSchema } from "@/lib/validations/auth";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -18,7 +19,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "E-Mail", type: "email" },
         password: { label: "Passwort", type: "password" },
       },
-      async authorize(raw) {
+      async authorize(raw, request) {
+        const ip =
+          request?.headers
+            ?.get("x-forwarded-for")
+            ?.split(",")[0]
+            ?.trim() ||
+          request?.headers?.get("x-real-ip") ||
+          "unknown";
+
+        // Brute-Force-Schutz: max. 10 Login-Versuche pro IP/Minute.
+        if (!rateLimitAllow(`login:${ip}`)) return null;
+
         const parsed = signInSchema.safeParse(raw);
         if (!parsed.success) return null;
 
