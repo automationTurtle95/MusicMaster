@@ -1,12 +1,69 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+/* MusicMaster – zentrale Design-Tokens (LUH-124, verifiziert gegen echtes
+ * Mockup in docs/mockup-2026-08-21/ via LUH-148).
+ *
+ * Die Werte wurden NICHT mehr aus der Textbeschreibung geraten, sondern
+ * 1:1 aus dem gelieferten Mockup (thumbnail.webp / MusicMaster.dc.html /
+ * support.js) übernommen:
+ *   - Page-/Sidebar-Hintergrund: Creme  #fbf8f1  (Sidebar im Mockup ist
+ *     creme, NICHT dunkelgrün – border-right 1px #ded4c1)
+ *   - Primärfarbe (Buttons/Avatare): Orange  #b06a17  (Hover #96580f,
+ *     Text #fff), Vorgabe aus Beschreibung #e0742b war zu grell/satt
+ *   - Akzentgrün (Charts/Hover):  #4f7a52
+ *   - Destructive/Chart "nicht erfüllt":  #a13b2f
+ *   - Text Ink / Muted:  #1e1a15 / #6b6155
+ */
+@theme {
+  --color-background: #fbf8f1;
+  --color-foreground: #1e1a15;
+
+  --color-card: #fffdf8;
+  --color-card-foreground: #1e1a15;
+
+  --color-popover: #fffdf8;
+  --color-popover-foreground: #1e1a15;
+
+  /* Primärfarbe: Orange (Primär-Buttons/Avatare laut Mockup) */
+  --color-primary: #b06a17;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #ede3d2;
+  --color-secondary-foreground: #1e1a15;
+
+  --color-muted: #f0e8d8;
+  --color-muted-foreground: #6b6155;
+
+  /* Akzent: dezentes Grün für Hover/Zustände (Mockup GRN #4f7a52) */
+  --color-accent: #e7efe6;
+  --color-accent-foreground: #4f7a52;
+
+  --color-destructive: #a13b2f;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #ded4c1;
+  --color-input: #ded4c1;
+  --color-ring: #b06a17;
+
+  /* Sidebar: warmes Creme wie der Rest der App (Mockup #fbf8f1,
+   * border-right #ded4c1) – Vorgabe "dunkles Grün" war falsch */
+  --color-sidebar: #fbf8f1;
+  --color-sidebar-foreground: #1e1a15;
+  --color-sidebar-accent: #e7efe6;
+  --color-sidebar-accent-foreground: #4f7a52;
+  --color-sidebar-border: #ded4c1;
+
+  --radius: 0.5rem;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
 }
