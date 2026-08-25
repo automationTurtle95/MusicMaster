@@ -35,5 +35,12 @@ Thumbs.db
 *.db
 *.db-journal
 
+# Persistent file storage (uploaded sheet PDFs) and Docker volume data
+storage/
+data/
+
 # Test results (vitest)
 test-results/
+
+# Uploaded sheet-music PDFs (persistent volume in Docker)
+storage/

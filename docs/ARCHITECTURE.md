@@ -66,6 +66,25 @@ Komplexität für den MVP; Microservices – frühes Over-Engineering.
 - **Auth/Rollen** ist querschnittlich → vor Modul-CRUD finalisieren (siehe Scaffold).
 - **Datei-Upload für Noten** benötigt Storage-Strategie (lokal vs. S3-kompatibel);
   im MVP zuerst lokal/DB-Referenz, später objektbasiert.
+
+### 5.1 Entscheidung Noten-Datei-Upload (LUH-118, Stand 2026-08-25)
+
+MVP = **lokale Dateiablage**, keine Schema-Änderung an `SheetMusic` (die Felder
+`storage` und `fileUrl` existieren bereits).
+
+- Upload: `POST /api/sheets/upload` (nur Manager) – validiert Typ (`application/pdf`),
+  Magic-Bytes (`%PDF-`) und Größe (20 MB), speichert nach `SHEET_STORAGE_DIR`
+  (`storage/sheets/<uuid>.pdf`) und liefert `fileUrl = /api/sheets/file/<uuid>.pdf` zurück.
+- Verknüpfung: Das zurückgegebene `fileUrl` wird per `PATCH /api/sheets/[id]` am
+  Notenstück gesetzt (bereits vorhanden).
+- Auslieferung: `GET /api/sheets/[id]/file` (jeder angemeldete Nutzer) – löst das
+  `fileUrl` auf; externe Links (`://`) werden per 302 umgeleitet, interne Token
+  aus dem persistenten Speicher ausgeliefert. Pfad-Traversal ausgeschlossen, da der
+  Dateiname immer `<uuid>.pdf` ist.
+- Cleanup: `DELETE /api/sheets/[id]` löscht die verknüpfte Datei mit.
+- **Bewusst noch offen (eigene Issues):** S3-kompatible Storage-Variante und ein
+  UI-Upload-Feld war bereits Teil des Managers; ein nutzbares MVP ist ohne
+  S3/Objektstorage erreicht.
 - **Mehrsprachigkeit** vorerst nur DE; i18n-Struktur sauber halten, aber nicht ausbauen.
 
 ## 6. Nächste Schritte

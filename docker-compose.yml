@@ -1,0 +1,22 @@
+# MusicMaster – Deployment (langlaufender, stateful Node-Server).
+# Hochgeladene Noten-PDFs landen unter /app/storage und MÜSSEN als persistentes
+# Volume gemountet sein, sonst gehen sie beim Container-Neustart verloren.
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/prisma/dev.db
+      # AUTH_SECRET unbedingt via .env setzen (sonst Signatur-Fehler bei Sessions).
+      - AUTH_SECRET=${AUTH_SECRET}
+    volumes:
+      # Persistente Ablage für hochgeladene Noten-PDFs (LUH-161).
+      - musicmaster-storage:/app/storage
+      # Persistente SQLite-Datenbank.
+      - musicmaster-db:/app/prisma
+
+volumes:
+  musicmaster-storage:
+  musicmaster-db:

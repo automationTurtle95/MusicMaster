@@ -4,6 +4,11 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isManager } from "@/lib/authz";
 import { sheetUpdateSchema } from "@/lib/validations/sheet";
+import {
+  deleteSheetFile,
+  isInternalFileToken,
+  serveFileIdFromUrl,
+} from "@/lib/storage";
 
 // GET /api/sheets/[id] – Einzelnes Notenstück.
 export async function GET(
@@ -55,6 +60,13 @@ export async function PATCH(
     fileUrl: patch.fileUrl === "" ? null : patch.fileUrl,
   };
 
+  // Alte Datei aus dem Storage entfernen, wenn die Referenz ausgetauscht wird.
+  const oldFileId = serveFileIdFromUrl(existing.fileUrl);
+  const newFileId = serveFileIdFromUrl(patch.fileUrl);
+  if (oldFileId && oldFileId !== newFileId) {
+    await deleteSheetFile(oldFileId).catch(() => undefined);
+  }
+
   const sheet = await prisma.sheetMusic.update({
     where: { id },
     data,
@@ -76,6 +88,13 @@ export async function DELETE(
   const existing = await prisma.sheetMusic.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  }
+
+  // Zurückgelassene hochgeladene PDF-Datei mitlöschen (kein Speicher-Leak).
+  // deleteSheetFile ist für nicht-interne Token (externe URLs) ein No-Op.
+  const fileUrl = existing.fileUrl;
+  if (fileUrl && isInternalFileToken(fileUrl)) {
+    await deleteSheetFile(fileUrl);
   }
 
   await prisma.sheetMusic.delete({ where: { id } });

@@ -54,6 +54,13 @@ export function SheetsManager() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Upload-Zustand für echtes PDF-Upload (statt nur URL-Copy-Paste).
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadedToken, setUploadedToken] = useState<string | null>(null);
+  const [uploadedName, setUploadedName] = useState<string | null>(null);
+
   async function load(q = "") {
     setLoading(true);
     const res = await fetch(q ? `/api/sheets?q=${encodeURIComponent(q)}` : "/api/sheets");
@@ -72,6 +79,11 @@ export function SheetsManager() {
     setEditing(null);
     setForm(EMPTY);
     setError(null);
+    setUploading(false);
+    setUploadProgress(0);
+    setUploadError(null);
+    setUploadedToken(null);
+    setUploadedName(null);
   }
 
   function startEdit(s: Sheet) {
@@ -86,6 +98,64 @@ export function SheetsManager() {
       notes: s.notes ?? "",
     });
     setError(null);
+    // Bereits hochgeladene interne Datei übernehmen (kein "://" = internes Token).
+    const isInternal = !!s.fileUrl && !s.fileUrl.includes("://");
+    setUploadedToken(isInternal ? s.fileUrl : null);
+    setUploadedName(
+      isInternal ? (s.fileUrl ?? "").split("/").pop() ?? s.fileUrl : null
+    );
+    setUploading(false);
+    setUploadProgress(0);
+    setUploadError(null);
+  }
+
+  function clearUpload() {
+    setUploadedToken(null);
+    setUploadedName(null);
+    setUploadError(null);
+    setForm((prev) => ({ ...prev, fileUrl: "" }));
+  }
+
+  function uploadFile(file: File) {
+    setUploading(true);
+    setUploadError(null);
+    setUploadProgress(0);
+
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/sheets/upload");
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        setUploadProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      setUploading(false);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          setUploadedToken(data.fileUrl);
+          setUploadedName(file.name);
+        } catch {
+          setUploadError("Unerwartete Antwort vom Server");
+        }
+      } else {
+        let msg = "Upload fehlgeschlagen";
+        try {
+          msg = JSON.parse(xhr.responseText)?.error ?? msg;
+        } catch {
+          /* ignore */
+        }
+        setUploadError(msg);
+      }
+    };
+    xhr.onerror = () => {
+      setUploading(false);
+      setUploadError("Netzwerkfehler beim Upload");
+    };
+    xhr.send(fd);
   }
 
   function update(field: keyof SheetInput, value: string) {
@@ -98,6 +168,8 @@ export function SheetsManager() {
     setError(null);
 
     const payload: Record<string, unknown> = { ...form };
+    // Hochgeladene Datei hat Vorrang vor manuellem URL-Feld.
+    payload.fileUrl = uploadedToken ?? form.fileUrl ?? "";
     if (!payload.fileUrl) payload.fileUrl = "";
     if (!payload.difficulty) delete payload.difficulty;
 
@@ -169,11 +241,21 @@ export function SheetsManager() {
                         </span>
                       )}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {s.composer ? `${s.composer} · ` : ""}
-                      {s.genre ?? "ohne Genre"}
-                      {s.storage ? ` · Lager: ${s.storage}` : ""}
-                    </p>
+                     <p className="text-xs text-muted-foreground">
+                       {s.composer ? `${s.composer} · ` : ""}
+                       {s.genre ?? "ohne Genre"}
+                       {s.storage ? ` · Lager: ${s.storage}` : ""}
+                     </p>
+                     {s.fileUrl && (
+                       <a
+                         href={s.fileUrl}
+                         target="_blank"
+                         rel="noreferrer"
+                         className="text-xs text-blue-600 underline"
+                       >
+                         Noten-PDF öffnen
+                       </a>
+                     )}
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -243,8 +325,41 @@ export function SheetsManager() {
                 onChange={(e) => update("storage", e.target.value)}
               />
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Noten-PDF (Upload)</label>
+              <input
+                type="file"
+                accept="application/pdf"
+                disabled={uploading}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) uploadFile(f);
+                }}
+                className="block w-full text-sm"
+              />
+              {uploading && (
+                <p className="text-xs text-muted-foreground">
+                  Upload… {uploadProgress}%
+                </p>
+              )}
+              {uploadError && (
+                <p className="text-sm text-destructive">{uploadError}</p>
+              )}
+              {uploadedName && (
+                <p className="text-xs text-muted-foreground flex items-center gap-2">
+                  <span>Hochgeladen: {uploadedName}</span>
+                  <button
+                    type="button"
+                    onClick={clearUpload}
+                    className="underline"
+                  >
+                    entfernen
+                  </button>
+                </p>
+              )}
+            </div>
             <Input
-              placeholder="Datei-Link (später Upload)"
+              placeholder="Externe Datei-URL (optional, statt Upload)"
               value={form.fileUrl}
               onChange={(e) => update("fileUrl", e.target.value)}
             />

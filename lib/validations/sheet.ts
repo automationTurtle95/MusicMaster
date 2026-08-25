@@ -7,7 +7,21 @@ export const sheetCreateSchema = z.object({
   genre: z.string().optional(),
   difficulty: sheetDifficulty.optional(),
   storage: z.string().optional(),
-  fileUrl: z.string().url().optional().or(z.literal("")),
+  // Erlaubt: leer, externe http(s)-URL (manuell gepflegt) ODER interne
+  // Serve-Route aus dem Upload (z. B. "/api/sheets/file/<uuid>.pdf"). Letztere
+  // wird serverseitig aus dem persistenten Speicher ausgeliefert.
+  fileUrl: z
+    .union([
+      z.literal(""),
+      z.string().url("Gültige URL erforderlich"),
+      z
+        .string()
+        .regex(
+          /^\/api\/sheets\/file\/[A-Za-z0-9_-]+\.pdf$/i,
+          "Ungültige interne Datei-Route"
+        ),
+    ])
+    .optional(),
   notes: z.string().optional(),
 });
 
