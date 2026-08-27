@@ -94,6 +94,14 @@ describe("SheetMusic file upload (LUH-118)", () => {
     ).toBe(422);
   });
 
+  it("rejects uploads exceeding the 20 MB size limit", async () => {
+    // Größenprüfung erfolgt im Upload-Route vor der Magic-Byte-Prüfung.
+    const MAX_BYTES = 20 * 1024 * 1024;
+    const big = new Uint8Array(MAX_BYTES + 1);
+    big.set(new TextEncoder().encode("%PDF-"), 0);
+    expect((await uploadPOST(uploadReq(pdfForm(big)))).status).toBe(413);
+  });
+
   it("rejects uploads from non-managers", async () => {
     const { auth } = await import("@/lib/auth");
     vi.mocked(auth).mockResolvedValueOnce({
