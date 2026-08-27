@@ -90,6 +90,10 @@ model Member {
 
   attendances Attendance[]
   eventMembers EventMember[]
+
+  // Vereinseigentum, das diesem Mitglied aktuell verliehen ist
+  // (ein Mitglied kann mehrere Instrumente haben; NULL = im Bestand).
+  instruments Instrument[]
 }
 
 model Rehearsal {
@@ -156,4 +160,31 @@ model SheetMusic {
   notes      String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Vereinseigentum – Instrumentenverwaltung (LUH-216)
+//
+// Ein Musikverein verwaltet Instrumente als Vereinseigentum: welches Instrument
+// (Register/Typ) existiert, welche Inventarnummer es hat, in welchem Zustand es
+// ist und an welches Mitglied es aktuell verliehen wurde.
+//
+// SQLite unterstützt keine Prisma-Enums; Register und Zustand werden als
+// `String` persistiert und an der API-Grenze per Zod-Enum validiert
+// (lib/validations/enums.ts).
+// ---------------------------------------------------------------------------
+
+model Instrument {
+  id              String   @id @default(uuid())
+  type            String // Register: Klarinette, Flöte, Trompete, ...
+  inventoryNumber String   @unique
+  condition       String // Zustand: Neuwertig, Gut, Bedingt, ...
+  notes           String?
+  memberId        String? // aktuell verliehen an (NULL = im Bestand)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  member Member? @relation(fields: [memberId], references: [id], onDelete: SetNull)
+
+  @@index([memberId])
 }

@@ -11,11 +11,13 @@ async function logoutAction() {
 }
 
 export async function Sidebar() {
-  const [membersCount, rehearsalsCount, sheetsCount] = await Promise.all([
-    prisma.member.count(),
-    prisma.rehearsal.count(),
-    prisma.sheetMusic.count(),
-  ]);
+  const [membersCount, rehearsalsCount, sheetsCount, instrumentsCount] =
+    await Promise.all([
+      prisma.member.count(),
+      prisma.rehearsal.count(),
+      prisma.sheetMusic.count(),
+      prisma.instrument.count(),
+    ]);
 
   const session = await auth();
   const role = session?.user?.role;
@@ -25,7 +27,8 @@ export async function Sidebar() {
     { num: "01", href: "/dashboard", label: "Dashboard", badge: null },
     { num: "02", href: "/rehearsals", label: "Probenplan", badge: rehearsalsCount },
     { num: "03", href: "/members", label: "Mitglieder", badge: membersCount },
-    { num: "04", href: "/sheets", label: "Notenarchiv", badge: sheetsCount },
+    { num: "04", href: "/instruments", label: "Instrumente", badge: instrumentsCount },
+    { num: "05", href: "/sheets", label: "Notenarchiv", badge: sheetsCount },
   ];
 
   return (
