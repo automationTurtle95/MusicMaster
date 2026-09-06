@@ -1,0 +1,26 @@
+{
+  "issue": "LUH-251",
+  "issueId": "1584db4a-9a23-409d-b8df-f4b31f096ce1",
+  "subjectRun": "b41f17a7-e5bf-4204-a964-84ccfaa19ba4",
+  "subjectAgent": "Lukas (438b1c89-778d-4213-bca7-bfec430a3eaf, opencode_local)",
+  "reviewer": "Odin / CTO (12190e84-4c6b-419c-a527-555d469c15c2)",
+  "reviewedAt": "2026-08-29T20:5xZ (auto-recovery heartbeat, run a0edfb6c-d6d5-45e5-91ac-c99b095a55bc)",
+  "disposition": "review_complete_false_positive_no_engineering_action",
+  "falsePositiveForCodeFault": true,
+  "evidence": {
+    "subjectRunCompletion": "ndjson shows step_finish reason=stop at 2026-08-29T00:08:34.031Z (seq 81); run auto-resumed at 00:00:05Z after daily quota reset and did real work 00:00:16->00:08:19Z.",
+    "osPid21724StateNow": "DEAD / not found on host (natural exit, not killed).",
+    "issueStatusNow": "blocked (activeRecoveryAction cause=provider_quota, attemptCount=9, scheduledRetry ~2026-08-29T21:46:32Z).",
+    "blockerAttention": "covered by LUH-253 (productivity review, no_comment_streak=16, blocked) — meta-artifact of 0-comment quota-failed reviewing runs."
+  },
+  "rootCauseOfSilence": "Provider quota exhaustion on free model tier (free-models-per-day). Adapter cannot get a model response -> no output -> watchdog silence during the quota gap. Same cause as the failed reviewing (Odin) runs.",
+  "analysis": "The run did go silent (real alert), but the cause is NOT a hung process, code bug, or architecture defect. The subject run's OS process (pid 21724) is already dead (clean exit) and the run log proves a clean, complete terminal state (reason=stop). There is therefore no process to cancel/recover and no orphaned artifact.",
+  "recommendedAction": "NONE at run/code level. External unblock owner: (a) free-tier daily quota reset, or (b) human adds credits / moves adapter off free-quota model. Then a write-scoped board/UI token should set LUH-251 -> done / false_positive.",
+  "controlPlaneActionsThisHeartbeat": {
+    "boardDispositionDoc": "UPDATED via PUT /api/issues/{id}/documents/{docId} (key luh-251-review-disposition) with definitive FALSE_POSITIVE verdict.",
+    "systemicFollowUp": "CREATED LUH-256 (delegated CTO action: auto-resolve stale_active_run_evaluation on terminal origin run; grant recovery reviewer issue-write scope; suppress silent-run alerts during quota window; consolidate per-run alerts).",
+    "issueStatusPatch": "403 Forbidden — agent token lacks issue-update scope; status cannot be flipped from this agent. Durable verdict carried by board doc + LUH-256."
+  },
+  "metaBlockerLUH-253": "productivity review (no_comment_streak=16) caused by 0-comment failed reviewing runs under quota; resolves once quota recovers and a write-scoped token closes LUH-251.",
+  "boardUserActionRequired": "Set LUH-251 to done/false_positive via UI or a token with issue-mutation scope (this agent token cannot write status). Track systemic fix in LUH-256 / LUH-155/156/157 cluster."
+}

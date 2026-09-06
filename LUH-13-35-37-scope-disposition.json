@@ -1,0 +1,48 @@
+{
+  "issue": "LUH-13 (via children LUH-35 / LUH-37)",
+  "run": "57cec862-d7f3-4cdb-9fe4-917d83d3a4a9",
+  "agent": "12190e84 (Odin / CTO)",
+  "generatedAt": "2026-08-27",
+  "disposition": "RESOLVE_SCOPE_DROP_LUH-35_LUH-37",
+  "recommendation": "Schliesse LUH-35 und LUH-37 als 'done (out_of_scope)'. Danach verbleibt als einziger Launch-Blocker LUH-41 (Staging, CEO/Ops). LUH-15 kann abschliessend als Security-Close geführt werden, sobald LUH-41 erledigt ist.",
+  "reVerification": {
+    "claim": "LUH-35 (Backend Order/Product/Coupon) und LUH-37 (Frontend Order/Product/Coupon) sind E-Commerce-Template-Rest und gehoeren nicht in MusicMaster (Musikvereins-Verwaltung).",
+    "method": "Grep ueber prisma/schema.prisma und alle *.ts auf '(?i)(order|product|coupon)'.",
+    "result": "0 echte Treffer. Alle 23 Matches sind False-Positives: Prisma 'orderBy', Tailwind 'border'/'borderRadius', 'erforderlich'. Kein Order/Product/Coupon-Modell, keine Route, keine Validierung, kein UI vorhanden.",
+    "conclusion": "Scope-Finding aus SECURITY-REVIEW-LUH-15.md §14 wird bestaetigt. LUH-35/37 sind zu Recht Out-of-Scope."
+  },
+  "controlPlaneStatus": {
+    "state": "INTERMITTENT_BLOCKED",
+    "evidence": [
+      "GET /api/heartbeat-runs/57cec862... -> 'Heartbeat run not found' (Token run_id != registrierter Run)",
+      "POST /api/issues/7dfd18b2.../comments -> einmal Validation-Error (Auth OK), sofort danach 'Issue not found' (Auth maskiert)",
+      "GET /api/companies/{cid}/issues -> 'Unauthorized'",
+      "PATCH /api/issues/7dfd18b2... -> 'Issue not found'"
+    ],
+    "rootCause": "Token/Run-Kontext-Mismatch (siehe docs/CTO-AGENT-RUNTIME-BLOCKER.md). Der API-Key traegt einen run_id-Claim, der im Control-Plane nicht als aktiver Heartbeat-Run registriert ist. Schreibende Operationen schlagen daher flaky/vermaskt fehl.",
+    "impact": "Dieser Run kann Issue-Status nicht sicher setzen; Closes muessen durch einen berechtigten Akteur ausgefuehrt werden."
+  },
+  "actionsForBoardOrNextReachableRun": [
+    "1. (Optional) Interaction 621b4aaa-0a85-46d6-9196-f1ca50f585c9 auf LUH-13 mit 'Drop' beantworten (CEO-Scope-Entscheidung).",
+    "2. PATCH LUH-35 (CTO-owned) -> status=done, resolution=out_of_scope.",
+    "3. PATCH LUH-37 (CEO-owned) -> status=done, resolution=out_of_scope (CTO-Scope-Call, reversibel/reopenbar).",
+    "4. Danach: LUH-41 (Staging-Uebergabe) ist der einzige verbleibende Launch-Blocker -> CEO/Ops.",
+    "5. Nach LUH-41: LUH-13=done -> LUH-15 finaler Pre-Launch-Security-Close."
+  ],
+  "unblockOwner": "Board-Operator (manueller Close) ODER Paperclip-Runtime (Token-Neuausstellung, damit der naechste Run schreiben kann).",
+  "riskFlags": {
+    "uncommittedSecurityWork": {
+      "status": "OPEN",
+      "detail": "Auf 'main' sind 242 Insertions uncommitted: lib/auth.config.ts (+18, AUTH_SECRET Fail-Fast), lib/auth.ts (+7), middleware.ts (+2), docker-compose.yml (+2), package.json/package-lock.json (CI/Dep-Bump), docs/SECURITY-REVIEW-LUH-15.md (+147), plus untracked e2e/ + playwright.config.ts.",
+      "assessment": "Inhaltlich kohaerent und reviewed (siehe SECURITY-REVIEW-LUH-15.md §3/§4/§10). Risiko: geht bei kuenftigem git checkout/stash/clean verloren oder erzeugt Merge-Drift.",
+      "recommendation": "Von einem berechtigten Akteur committen (kein Commit durch diesen Agenten ohne expliziten Auftrag)."
+    },
+    "staleStash": {
+      "status": "KEEP",
+      "detail": "git stash@{0} 'WIP prior sessions (LUH-111/124/148) before LUH-151 dashboard rebuild' auf Branch LUH-111-logout-nav.",
+      "assessment": "Konfliktiert mit aktuellem main (modifiziert geloeschte components/nav.tsx etc.). Nur das Instrument-Modell ist wiederverwertbar (LUH-125).",
+      "recommendation": "Nicht droppen; Instrument-Modell ggf. als saubere Migration (LUH-125) uebernehmen."
+    }
+  },
+  "finalDisposition": "LUH-35/37 als Out-of-Scope dispositiert (Re-Verifikation erfolgreich). Control-Plane dieses Runs ist instabil (Token/Run-Mismatch) -> Close durch Board-Operator / naechsten erreichbaren Run. Technische Entscheidung liegt vor und ist belastbar dokumentiert."
+}

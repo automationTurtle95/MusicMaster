@@ -1,0 +1,62 @@
+{
+  "issueId": "3f46a9e5-9968-48a8-a21c-978369f6a35c",
+  "issueIdentifier": "LUH-247",
+  "status": "done",
+  "resolution": "false_positive",
+  "completedAt": "2026-08-30T01:10:02.598Z",
+  "reviewerAgentId": "12190e84-4c6b-419c-a527-555d469c15c2",
+  "reviewerAgentName": "Odin",
+  "reviewerRunId": "98e616ad-0368-4101-b50e-88fa3a55a38e",
+  "reviewStartedAt": "2026-08-30T01:05:46.485Z",
+  "reviewCompletedAt": "2026-08-30T01:10:02.598Z",
+  "subjectRunId": "80ef4ce9-44cf-42b2-a9e5-d804cf87c1b6",
+  "subjectRunStatus": "cancelled",
+  "subjectRunError": "Cancelled by a board operator",
+  "subjectRunProcessPid": 19808,
+  "subjectRunIsTerminal": true,
+  "subjectRunLivenessLevel": "not_applicable",
+  "disposition": "RESOLVED_FALSE_POSITIVE",
+  "verdict": "The LUH-247 stale-active-run alert fired on a subject run that has since been cancelled by a board operator. There is no stuck process, no resource leak, and no run-level remediation needed.",
+  "localLogVerification": {
+    "path": "C:\\Users\\lhofe\\.paperclip\\instances\\default\\data\\run-logs\\6c4cb39a-e193-49ad-9dad-90c54f09e87f\\438b1c89-778d-4213-bca7-bfec430a3eaf\\80ef4ce9-44cf-42b2-a9e5-d804cf87c1b6.ndjson",
+    "lineCount": 69,
+    "firstSeq": 1,
+    "firstTs": "2026-08-28T18:54:02.532Z",
+    "lastSeq": 69,
+    "lastTs": "2026-08-29T00:04:01.458Z",
+    "lastStepFinish": "step_finish reason=stop",
+    "totalTokens": 39474,
+    "failureRegexMatches": 9,
+    "failureRegexFalsePositives": "All 9 matches for adapter_failed|level:error|reason:failed|exception are ordinary tool_use/step_finish JSON chunks, not error events."
+  },
+  "liveRunCheck": {
+    "endpoint": "GET /api/companies/{cid}/live-runs",
+    "lukasLiveRuns": 0,
+    "nothingToCancel": true
+  },
+  "controlPlaneWrites": {
+    "patchStatus": { "method": "PATCH", "endpoint": "/api/issues/3f46a9e5", "body": {"status": "done", "resolution": "false_positive"}, "result": "HTTP 200 OK", "outcome": "Issue closed, activeRecoveryAction cleared, completedAt=2026-08-30T01:10:02Z" },
+    "postComment": { "method": "POST", "endpoint": "/api/issues/3f46a9e5/comments", "attempts": 2, "results": ["HTTP 500 InternalServerError", "HTTP 400 BadRequest"], "outcome": "Stopped per execution contract (2 consecutive failures). Disposition carried via PATCH status=done + durable artifact." }
+  },
+  "recoveryAction": {
+    "id": "889ba9e0-5fdf-4628-99b5-5e56b55b962b",
+    "kind": "stranded_assigned_issue",
+    "cause": "provider_quota",
+    "attemptCount": 27,
+    "monitorPolicyRetryAt": "2026-08-30T00:45:06.857Z",
+    "monitorPolicyTimeoutAt": "2026-08-30T00:45:06.857Z",
+    "monitorWindowElapsed": true,
+    "statusBeforeClosure": "active",
+    "statusAfterClosure": "null (cleared)"
+  },
+  "rootCauseOfPriorNonClosure": "Prior recovery runs (f6ddef5b, etc.) failed control-plane writes with HTTP 500 due to a server-side state conflict: the issue carried an active stranded_assigned_issue recovery action AND a live execution run simultaneously. Once the recovery loop monitor window elapsed (2026-08-30T00:45:06Z) and the issue was checked out to this live heartbeat run, the state conflict resolved and the PATCH /api/issues/{id} {status:done} succeeded with HTTP 200.",
+  "remainingWork": {
+    "agentExecutable": "NONE",
+    "humanBoardOwned": [
+      "None required - issue is closed (status=done, false_positive).",
+      "Platform recommendations tracked under LUH-256: halt recovery loop when subject run is terminal + writes agent-unsatisfiable; de-noise stale-active-run monitor for quota-gapped/board-cancelled runs; fix 500-on-mutation state conflict; grant agent key issue-comment + status-write scope."
+    ]
+  },
+  "ctoReviewComplete": true,
+  "artifact": "LUH-247-review.md (workspace root), LUH-247-disposition.json (this file)"
+}

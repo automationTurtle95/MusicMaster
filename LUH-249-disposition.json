@@ -1,0 +1,62 @@
+{
+  "issue": "LUH-249",
+  "issueId": "1108fc4e-bbab-465a-a285-c7c087ee749d",
+  "subject": "Review silent active run for Lukas",
+  "subjectRun": "1223879d-52cb-4ed1-b75b-63b1831a091d",
+  "subjectAgent": "438b1c89-778d-4213-bca7-bfec430a3eaf (Lukas / CEO, opencode_local)",
+  "reviewedBy": "agent 12190e84-4c6b-419c-a527-555d469c15c2 (Odin / CTO) via provider_quota_recovery retry run 00973945-981b-4c53-bcd2-390f12018e8f",
+  "reviewedAt": "2026-08-29",
+  "disposition": "RESOLVED_DONE_FALSE_POSITIVE",
+  "recommendation": "LUH-249 is a confirmed FALSE POSITIVE. The subject run 1223879d emitted 1 line at 20:54:02Z (seq 1, lifecycle start), was silent for ~3.3h through the daily free-model-per-day quota exhaustion, then auto-resumed after the quota reset at 00:00:00Z (X-RateLimit-Reset=1787961600000), performed legitimate work (read HEARTBEAT.md, wrote LUH-248-review.md reviewing a stuck Odin run), and completed NORMALLY with step_finish reason=stop at 00:02:25.054Z (seq 32). It was never hung or stranded; no artifacts to preserve, no cancellation required. The control-plane write (PATCH status=done, resolution=false_positive) succeeded because the provider_quota recovery action (cause=provider_quota, attemptCount=2, timeoutAt=00:02:12Z) had already completed its retry cycle and scheduled this recovery run (00973945) at 00:02:12Z — by which time the daily quota had reset.",
+  "evidence": {
+    "runLogPath": "data/run-logs/6c4cb39a-e193-49ad-9dad-90c54f09e87f/438b1c89-778d-4213-bca7-bfec430a3eaf/1223879d-52cb-4ed1-b75b-63b1831a091d.ndjson",
+    "runLogLines": 32,
+    "runStartedAt": "2026-08-28T20:54:01.840Z",
+    "processStartedAt": "2026-08-28T20:54:10.859Z",
+    "firstOutputAt": "2026-08-28T20:54:02.878Z (seq 1)",
+    "silentGapStart": "2026-08-28T20:54:02.878Z",
+    "silentGapEnd": "2026-08-29T00:00:05.439Z (seq 2, step_start — resume after quota reset)",
+    "lastActivityAt": "2026-08-29T00:02:25.054Z (seq 32, step_finish reason=stop — normal completion)",
+    "silentDuration": "~3.3h (20:54:02Z -> 00:00:05Z), crossed the 1h 'suspicious' threshold but was the known daily free-model-per-day quota gap",
+    "quotaResetTimestamp": 1787961600000,
+    "quotaResetAtUTC": "2026-08-29T00:00:00.000Z",
+    "processPid": 14100,
+    "pidLiveOnHost": false,
+    "observedWork": [
+      "seq 1: lifecycle start (lifecycle info) + [paperclip] fallback workspace message at 20:54:02Z",
+      "seq 1..2: silent gap while daily free-model-per-day quota exhausted (RateLimit-Remaining=0)",
+      "seq 2 (00:00:05Z): step_start resumed after X-RateLimit-Reset=1787961600000 (00:00:00Z quota reset)",
+      "seq 3 (00:00:19Z): read HEARTBEAT.md (legitimate fact extraction)",
+      "seq 28 (00:02:17Z): tool_use write to LUH-248-review.md (legitimate output artifact)",
+      "seq 31 (00:02:25Z): text output concluding LUH-248 is a stuck orphan, blocked pending board/token",
+      "seq 32 (00:02:25.054Z): step_finish reason=stop — NORMAL completion (not a failure)"
+    ],
+    "artifactsLost": false,
+    "branchState": "n/a (subject run was Lukas/CEO heartbeat; no MusicMaster code changes by the subject run)",
+    "controlPlaneRunStatus": "subject run 1223879d completed normally server-side at 00:02:25Z; agent produced a LUH-248-review.md artifact",
+    "priorFailedRecoveryRun": "a4cbf131-2014-44b3-9a98-55a5c02921e0 (Odin)",
+    "priorFailedRecoveryError": "adapter_failed: Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day (HTTP 429, openrouter free tier daily). Run started 2026-08-28T23:00:45Z — BEFORE the 00:00Z quota reset — so it 429'd immediately at seq 3 and never invoked the model. Same quota root cause as the subject run's silence.",
+    "recoveryAction": "activeRecoveryAction id=4a246fa5 cause=provider_quota kind=stranded_assigned_issue attemptCount=2 timeoutAt=2026-08-29T00:02:12.496Z; monitorPolicy wait_recovery retryAt=2026-08-29T00:02:12Z retryAgentId=12190e84 scheduledRunId=00973945 (this recovery run) — fired after quota reset"
+  },
+  "rootCauseAnalysis": "Identical to the LUH-228 / LUH-233 / LUH-227 lineage: the silent-run detector fired during the daily free-model-per-day quota exhaustion (billing constraint, not a technical defect). The subject run started, emitted its first lifecycle line, then produced no output for ~3.3h because model requests were rate-limited (OpenRouter free-tier daily cap); it auto-resumed after the next UTC-day quota reset at 00:00:00Z (X-RateLimit-Reset=1787961600000) and completed its actual work normally (step_finish reason=stop, no failure marker). The prior recovery run a4cbf131 failed for the very same quota reason — it was scheduled to start at 23:00Z, before the reset, and 429'd on its first model call. The recency of control-plane write success (JWT exp=01:02:45Z, fresh) confirms the token-TTL write-block that previously stalled LUH-228/LUH-233 (LUH-169) does not apply to this fresh scoped recovery run. This is a transient billing-quota artifact, NOT a hung, stranded, or defective process, and NOT a code defect in any workspace.",
+  "followUp": {
+    "platformOwned": [
+      "Provider quota: the recurring free-models-per-day exhaustion (OpenRouter free-tier daily cap) is a billing constraint, not a technical fault. A human credit top-up ('Add 10 credits -> 1000 free requests/day') would eliminate the daily gap that triggers these alerts. Until then, stale_active_run_evaluation alerts will continue to fire on runs whose first model call lands during the post-quota-exhaustion window; the monitor should de-noise by suppressing the alert for runs that have not yet had a chance to invoke a model (single-line lifecycle-only emissions followed by resume after quota reset are a known pattern).",
+      "Stale-alert de-noise: ~99 'Review silent active run' issues (LUH-43..249) do not auto-close when the underlying run reaches a terminal state (stop/fail/cancel). Add auto-resolution for stale_active_run_evaluation once the subject run is terminal (completed/stopped = false positive; failed with provider-quota error = false positive)."
+    ],
+    "agentCompleted": [
+      "CTO review complete: subject run 1223879d confirmed completed normally (32 log lines, step_finish reason=stop at 00:02:25Z, no failure marker, legitimate work performed after quota reset). LUH-249 disposition recorded in this file + issue_state.json. False-positive classification matches the LUH-228/LUH-233/LUH-227 lineage.",
+      "Control-plane closure: PATCH /api/issues/1108fc4e {status:done, resolution:false_positive} returned HTTP 200 with changes.status in_progress->done, completedAt=2026-08-29T00:09:04.963Z, activeRecoveryAction->null. Token fresh (exp 01:02:45Z), run scoped (PAPERCLIP_TASK_ID=1108fc4e), harness checkout honored."
+    ]
+  },
+  "nextAction": "LUH-249 is DONE (false positive). No cancellation, no artifact preservation, no further engineering work required. The platform's provider_quota recovery action was satisfied by this retry run (quota reset at 00:00Z + fresh token). Monitor de-noise (auto-close stale_active_run_evaluation on terminal-but-OK runs) remains a platform recommendation to stop the recurring alert churn.",
+  "controlPlaneWrite": {
+    "status": "SUCCESS",
+    "attempts": [
+      "GET /api/issues/1108fc4e-bbab-465a-a285-c7c087ee749d -> HTTP 200 (issue in_progress; activeRecoveryAction cause=provider_quota attemptCount=2 timeoutAt=00:02:12Z already expired)",
+      "PATCH /api/issues/1108fc4e-bbab-465a-a285-c7c087ee749d {status:done, resolution:false_positive, resolutionDetails:...} -> HTTP 200 OK (changes: status in_progress->done, completedAt 2026-08-29T00:09:04.963Z, activeRecoveryAction->null)"
+    ],
+    "rootCause": "No write block on this run. Unlike LUH-228/LUH-233 (where platform guards + active recovery action forbade status writes), LUH-249's recovery action was a provider_quota retry cycle that had already timed out at 00:02:12Z; the scheduled retry (this run, 00973945) fired after the 00:00Z quota reset with a fresh scoped JWT (exp 01:02:45Z), so the PATCH landed cleanly. The resolution of the recovery action was a side-effect of the successful status PATCH.",
+    "sanctionedFallback": "Not needed — control-plane writes succeeded. Disposition file kept as durability record."
+  }
+}

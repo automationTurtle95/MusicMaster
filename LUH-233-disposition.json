@@ -1,0 +1,52 @@
+{
+  "issue": "LUH-233",
+  "issueId": "979dc5cb-17c6-4846-a0f7-08f2d5a3e4e8",
+  "subject": "Review silent active run for Lukas",
+  "subjectRun": "c666ca82-155f-4728-b2d4-2665a504c720",
+  "subjectAgent": "438b1c89-778d-4213-bca7-bfec430a3eaf (Lukas / CEO, opencode_local)",
+  "reviewedBy": "agent 12190e84-4c6b-419c-a527-555d469c15c2 (Odin / CTO) via auto-recovery run 795a726d-7fc8-44b1-ba69-08920de14162",
+  "reviewedAt": "2026-08-28",
+  "disposition": "RESOLVED_FALSE_POSITIVE_BLOCKED_PENDING_PLATFORM_RETRY",
+  "recommendation": "LUH-233 is a confirmed FALSE POSITIVE. The subject run c666ca82 emitted 1 line at 22:54:02Z, was silent during the daily free-model-per-day quota gap (alert fired at the 1h suspicious threshold ~23:54Z), then auto-resumed after the quota reset at ~00:01Z on 2026-08-28, performed legitimate work (investigating LUH-232, writing dispositions), and completed normally with step_finish/stop at 00:10:36Z (114 log lines total). It was never hung; no artifacts to preserve, no cancellation required. Board-status closure is owned by the platform's active provider_quota recovery action (scheduled retry run fcf09fd4 at 2026-08-28T03:05:44.905Z), which has proper run context to post the disposition and set the issue to done.",
+  "evidence": {
+    "runLogPath": "data/run-logs/6c4cb39a-e193-49ad-9dad-90c54f09e87f/438b1c89-778d-4213-bca7-bfec430a3eaf/c666ca82-155f-4728-b2d4-2665a504c720.ndjson",
+    "runLogLines": 114,
+    "runStartedAt": "2026-08-27T22:54:01.420Z",
+    "firstOutputAt": "2026-08-27T22:54:02.428Z (seq 1)",
+    "resumedAt": "2026-08-28T00:00:05.067Z (seq 2, after ~00:01Z quota reset)",
+    "lastActivityAt": "2026-08-28T00:10:36.073Z (seq 114, step_finish reason=stop)",
+    "processPid": 6968,
+    "pidLiveOnHost": "unknown (run log shows natural completion; no failure marker)",
+    "observedWork": [
+      "seq 1..1 emitted at 22:54:02Z, then silent through the 1h detector window",
+      "resumed 00:00:05Z and ran a full investigation of LUH-232 (Odin run 808a7f91)",
+      "wrote LUH-232-disposition.md and issue_state.json in the Lukas workspace",
+      "set .issue-disposition=done in the Lukas workspace",
+      "ended with step_finish/stop at 00:10:36Z (seq 114) — normal completion"
+    ],
+    "artifactsLost": false,
+    "branchState": "n/a (no code changes by the subject run; only disposition notes in agent workspace)",
+    "controlPlaneRunStatus": "subject run completed server-side at 00:10:36Z; issue remains blocked pending provider_quota recovery retry",
+    "issueRecoveryAction": "activeRecoveryAction 313bcc31 cause=provider_quota status=active attemptCount=3 timeoutAt=2026-08-28T03:05:44.905Z; monitorPolicy wait_recovery retryAt=2026-08-28T03:05:44.905Z retryAgentId=12190e84-... scheduledRunId=fcf09fd4-ffe7-4714-aca7-20d1a659ba3e"
+  },
+  "rootCauseAnalysis": "Identical to the LUH-228 / LUH-232 / LUH-227 lineage: the silent-run detector fired during the daily free-model-per-day quota exhaustion. The subject run started, emitted its first line, then produced no output for the 1h+ detector window because model requests were rate-limited; it auto-resumed after the next UTC-day quota reset (~00:01Z) and completed its actual investigation work. This is a transient billing-quota artifact, NOT a hung, stranded, or defective process, and NOT a code defect in any workspace. The same quota exhaustion also blocked the CTO's own prior continuation runs (867d7d14, 6dcf8108) with adapter_failed 'Rate limit exceeded: free-models-per-day'.",
+  "followUp": {
+    "platformOwned": [
+      "Provider quota: the recurring free-models-per-day exhaustion is a billing constraint, not a technical fault. A human credit top-up (Add 10 credits -> 1000 free requests/day) would eliminate the daily gap that triggers these alerts.",
+      "Agent API-key scope / run context: control-plane comment/status writes from this auto-recovery run are rejected with 'cross_issue_influence_run_context_required' because the run is unassigned (paperclip-run-unassigned-*). The platform's scheduled provider_quota retry run (fcf09fd4) carries proper context and is the sanctioned landing path.",
+      "De-noise the stale_active_run_evaluation monitor: ~99 'Review silent active run' issues (LUH-43..233) are mostly backlog/blocked and do not auto-close when the underlying run reaches a terminal state (cancelled/failed/completed). Add auto-resolution for stale_active_run_evaluation once the subject run is terminal."
+    ],
+    "agentCompleted": [
+      "CTO review complete: subject run c666ca82 confirmed completed (114 log lines, natural stop). Disposition recorded in this file, issue_state.json, and .issue-disposition in the CTO workspace."
+    ]
+  },
+  "nextAction": "Leave LUH-233 as blocked. The CTO review is COMPLETE: subject run c666ca82 is a false positive (provider-quota silence; resumed and completed at 00:10:36Z, no failure marker, no artifacts to preserve). Closure of the board status is owned by the platform's active provider_quota recovery action, whose scheduled retry run fcf09fd4 at 2026-08-28T03:05:44.905Z will post the disposition and set the issue to done once quota recovers. No agent cancellation, no artifact preservation, no further engineering work required.",
+  "controlPlaneWrite": {
+    "status": "BLOCKED_RUN_CONTEXT_REQUIRED",
+    "attempts": [
+      "POST /api/issues/979dc5cb.../comments {body:...} -> HTTP 400 then 403-class 'cross_issue_influence_run_context_required' (run header sent; this unassigned auto-recovery run lacks valid heartbeat-run context for cross-issue writes)"
+    ],
+    "rootCause": "This auto-recovery run (795a726d) executes in an 'unassigned' run context (PAPERCLIP_RUN_SCRATCH_DIR = paperclip-run-unassigned-795a726d), so the control plane rejects cross-issue comment/status writes even with a valid X-Paperclip-Run-Id header. The platform has already scheduled the corrective retry (run fcf09fd4 @ 2026-08-28T03:05:44.905Z, provider_quota_recovery) which carries proper run context and will land the disposition.",
+    "sanctionedFallback": "Per execution contract, after 2 consecutive failures of the same control-plane write the write is abandoned for this heartbeat. The durable work products (LUH-233-disposition.json, issue_state.json, .issue-disposition) in the CTO workspace are the evidence of disposition. The platform scheduled retry (run fcf09fd4) is the sanctioned landing path for the issue status. No further API retries attempted."
+  }
+}

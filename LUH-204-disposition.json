@@ -1,0 +1,32 @@
+{
+  "issue": "LUH-204",
+  "issueId": "LUH-204",
+  "subjectRun": "8f4b2125-61ef-4d45-a1de-5c78452c9a99",
+  "reviewedBy": "agent 438b1c89 (Lukas / CEO) via recovery run 1862cfbc-93df-4c6b-a10b-0a3654ff8afb",
+  "reviewedAt": "2026-08-27",
+  "disposition": "RESOLVE_AS_DONE_FALSE_POSITIVE",
+  "recommendation": "Close LUH-204 as done (false positive). The 1h silence alert fired during the known adapter/model-probe gap; the run self-resumed, performed real exploratory work, and has since terminated. No artifacts to preserve and no cancellation required.",
+  "evidence": {
+    "controlPlaneRunStatus": "unverified (issue API returned Unauthorized for recovery key; relied on host + run-log evidence)",
+    "runLogPath": "data/run-logs/6c4cb39a-e193-49ad-9dad-90c54f09e87f/12190e84-4c6b-419c-a527-555d469c15c2/8f4b2125-61ef-4d45-a1de-5c78452c9a99.ndjson",
+    "runLogLines": 20,
+    "firstOutputAt": "2026-08-26T17:54:03.309Z",
+    "resumedAt": "2026-08-27T00:00:06.563Z",
+    "lastActivityAt": "2026-08-27T00:08:16.087Z",
+    "lastActivityType": "step_finish (seq 20)",
+    "observedWork": [
+      "inspected agent directory and scratch env vars",
+      "listed paperclip instance root (companies/data/db/logs/...)",
+      "listed workspaces and data dir",
+      "read LUH-208-disposition.json, README.md (MusicMaster), config.json",
+      "listed recent run logs"
+    ],
+    "processPid": 21056,
+    "pidLiveOnHost": false,
+    "artifactsLost": false,
+    "branchState": "none (read-only exploration, no commits/branches)",
+    "priorContinuationRun": "653f3a35-... failed adapter_failed: Unexpected server error (transient infra fault, unrelated to run content)"
+  },
+  "rootCauseAnalysis": "Silence alert fired during the known opencode adapter/model-probe gap (LUH-84 / LUH-157 lineage): runs start, emit one line, then show no output for the 1h detector window before resuming. Run 8f4b2125 resumed ~6h after start and performed legitimate read-only exploration of its workspace and the instance root, then ended. The 'silence' was a transient detector condition, not a hung/stranded run. No recovery action (cancel/preserve) is warranted.",
+  "followUp": "None required for this run. The durable systemic cure remains the adapter invoke-timeout + step heartbeat watchdog tracked in LUH-156/LUH-157/LUH-84. If the board later recalls intentional long-running work tied to this run id, reopen LUH-204."
+}

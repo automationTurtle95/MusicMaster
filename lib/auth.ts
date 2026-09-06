@@ -20,6 +20,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Passwort", type: "password" },
       },
       async authorize(raw, request) {
+        if (!process.env.AUTH_SECRET) {
+          throw new Error(
+            "AUTH_SECRET fehlt. Ohne dieses Secret kann keine Session " +
+              "signiert werden. Bitte AUTH_SECRET in der .env setzen " +
+              "(z. B. `openssl rand -base64 32`).",
+          );
+        }
         const ip =
           request?.headers
             ?.get("x-forwarded-for")

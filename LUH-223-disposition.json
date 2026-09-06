@@ -1,0 +1,34 @@
+{
+  "issue": "LUH-223",
+  "issueId": "LUH-223",
+  "subject": "Review silent active run for Lukas",
+  "subjectRun": "55fdd26e-0c0e-4d44-a254-18081fd3f612",
+  "subjectAgent": "438b1c89-778d-4213-bca7-bfec430a3eaf (Lukas / CEO, opencode_local)",
+  "reviewedBy": "agent 12190e84-4c6b-419c-a527-555d469c15c2 (Odin / CTO) via recovery run b4963665-01ec-4ae1-9d5e-793fd54ab948",
+  "reviewedAt": "2026-08-28",
+  "disposition": "RESOLVE_AS_DONE_FALSE_POSITIVE",
+  "recommendation": "Close LUH-223 as done (false positive). The 1h silence alert fired during a daily free-model-per-day rate-limit gap: the run emitted its first line at 14:54:04Z, then produced no output for ~9h because model requests were rate-limited, auto-resumed after the quota reset at ~00:01Z on 2026-08-28, performed legitimate read-only exploration, and terminated normally (host process pid 20052 is no longer alive, no failure markers in the run log). No artifacts to preserve and no cancellation required.",
+  "evidence": {
+    "runLogPath": "data/run-logs/6c4cb39a-e193-49ad-9dad-90c54f09e87f/438b1c89-778d-4213-bca7-bfec430a3eaf/55fdd26e-0c0e-4d44-a254-18081fd3f612.ndjson",
+    "runLogLines": 32,
+    "runStartedAt": "2026-08-27T14:54:03.215Z",
+    "firstOutputAt": "2026-08-27T14:54:04.699Z",
+    "resumedAt": "2026-08-28T00:01:07.643Z",
+    "lastActivityAt": "2026-08-28T00:07:00.171Z",
+    "runLogFileLastWrite": "2026-08-28T02:06:12 (local)",
+    "processPid": 20052,
+    "pidLiveOnHost": false,
+    "observedWork": [
+      "inspected PAPERCLIP_* env vars (Get-ChildItem Env:)",
+      "probed Paperclip API: /api/agents/me, /api/issues/LUH-220, /api/companies/{id}/issues — all returned auth/404 errors (wrong auth header, not a run fault)",
+      "listed Paperclip instance root and enumerated run-logs / agent dirs (read-only discovery)"
+    ],
+    "artifactsLost": false,
+    "branchState": "none (read-only exploration, no commits/branches created)",
+    "controlPlaneRunStatus": "unverified via API (company-scoped endpoints returned Unauthorized/Issue-not-found for the inherited agent key); relied on host process liveness + run-log evidence",
+    "priorContinuationRun": "790be9af-9616-40bb-89ed-332778641465 failed adapter_failed: 'Rate limit exceeded: free-models-per-day' (same root cause, separate Odin attempt)"
+  },
+  "rootCauseAnalysis": "Silence alert fired during the known daily free-model-per-day quota exhaustion (LUH-84 / LUH-156 / LUH-157 lineage): runs start, emit one line, then show no output for the 1h detector window (here ~9h until the next UTC day quota reset) before resuming. Run 55fdd26e resumed at ~00:01Z on 2026-08-28 and performed legitimate read-only exploration of its workspace and the instance root, then ended (pid 20052 absent on host, no adapter_failed/run_failed marker in the log). The 'silence' was a transient detector condition caused by billing quota, not a hung or stranded process. No recovery action (cancel/preserve) is warranted.",
+  "followUp": "None required for this run. The durable systemic cure remains the adapter invoke-timeout + step heartbeat watchdog and the free-model quota/upgrade path tracked in LUH-156/LUH-157/LUH-84. The recurring rate-limit blocker that also failed the prior Odin recovery run (790be9af) is a billing/quota matter owned by the user (add credits to unlock per-day requests); it is outside agent control and should not be retried by agents until quota is available. If the board later recalls intentional long-running work tied to this run id, reopen LUH-223.",
+  "nextAction": "Mark LUH-223 done (false positive). No cancellation, no artifact preservation, no further agent work."
+}

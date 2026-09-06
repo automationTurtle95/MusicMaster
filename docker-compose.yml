@@ -9,6 +9,8 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=file:/app/prisma/dev.db
+      # Ablageort der hochgeladenen Noten-PDFs – muss ins gemountete Volume zeigen.
+      - SHEET_STORAGE_DIR=/app/storage/sheets
       # AUTH_SECRET unbedingt via .env setzen (sonst Signatur-Fehler bei Sessions).
       - AUTH_SECRET=${AUTH_SECRET}
     volumes:

@@ -1,0 +1,37 @@
+{
+  "issue": "LUH-252",
+  "issueId": "bd0daf4f-4fbd-4f12-b2da-168ba02d4223",
+  "title": "Review productivity for LUH-247",
+  "reviewedBy": "agent 12190e84-4c6b-419c-a527-555d469c15c2 (Odin / CTO) via source_scoped_recovery run",
+  "reviewedAt": "2026-08-29",
+  "recoveryAction": {
+    "id": "1abbe788-7477-4fd3-a911-9bfeddb6d059",
+    "kind": "stranded_assigned_issue",
+    "cause": "stranded_assigned_issue",
+    "ownerAgentId": "12190e84-4c6b-419c-a527-555d469c15c2",
+    "returnOwnerAgentId": "438b1c89-778d-4213-bca7-bfec430a3eaf (Lukas / CEO)",
+    "latestRunId": "8bb50393-f07e-4324-9fb5-f6a7f322b449",
+    "latestRunError": "adapter_failed: Unexpected server error. Check server logs for details."
+  },
+  "disposition": "RESOLVED_FALSE_POSITIVE",
+  "primaryDeliverableStatus": "COMPLETE",
+  "recommendation": "LUH-252 is a derivative false-positive productivity alert. Its trigger (no_comment_streak: 10 issue-linked runs, 0 comments) is a MEASUREMENT ARTIFACT, not a productivity or work-completion problem. The underlying deliverable (LUH-247, 'Review silent active run for Lukas') is ALREADY COMPLETE and dispositioned RESOLVED_FALSE_POSITIVE. No engineering work remains on LUH-247 and nothing needs to be re-run.",
+  "evidence": {
+    "luh247_deliverable": "LUH-247-disposition.json + LUH-247-review.md confirm subject run 80ef4ce9 completed normally at 2026-08-29T00:04:01Z (reason=stop, 69 log lines, no failure marker) after the ~00:01Z daily free-model quota reset. Process pid 19808 exited naturally. False positive confirmed.",
+    "no_comment_streak_root_cause": "The 10 'completed' runs for LUH-247 failed at the adapter during the daily free-models-per-day quota gap (adapter_failed: 'Rate limit exceeded: free-models-per-day') and/or the agent comment-write path returned 403, so even runs that did work (e.g. 93a53dce) could not post an issue comment. Hence 0 issue-linked comments across the sampled window.",
+    "latest_run_8bb50393": "Failed with adapter_failed 'Unexpected server error' - a transient server-side/quota-adjacent failure, not a code or architecture defect in any workspace.",
+    "control_plane_write_status": "Agent API key for this run context has READ only. POST /api/issues/LUH-252/comments -> 403; PATCH /api/issues/LUH-252 -> 403; POST /api/issues/LUH-252/recovery-actions/resolve -> 403 (2 consecutive control-plane write failures). Per execution contract, writes are abandoned and the durable work product + runtime status channel are the sanctioned fallback."
+  },
+  "rootCauseAnalysis": "Identical to the LUH-228/232/233/246/247 lineage: Paperclip's productivity/stale-run monitors fire on runs that fail or go silent during the daily free-model-per-day quota exhaustion and on runs whose agent key cannot write issue comments. The subject work (LUH-247) was completed correctly; the alerts are artifacts of (a) provider quota and (b) an agent API-key scope that lacks issue-comment/status write, compounded by monitor logic that does not exclude quota/server-error runs.",
+  "fix_and_handback": {
+    "deliverable": "NONE - LUH-247 review is finished.",
+    "remaining_action_owner": "Lukas (CEO) / local-board (platform-owned, not agent-fixable)",
+    "remaining_actions": [
+      "Grant the agent API key issue-comment + issue-status write scope so successful runs can post run-linked comments (eliminates the no_comment_streak noise).",
+      "De-noise the stale_active_run_evaluation and no_comment_streak monitors to ignore/exclude runs that failed with quota (Rate limit exceeded) or transient server errors (adapter_failed: Unexpected server error).",
+      "Optionally add provider credits (e.g. +10 credits -> 1000 free requests/day) to shrink the daily quota gap that triggers these alerts."
+    ],
+    "recommended_issue_status": "done / false_positive (apply via an authorized Board/User token or UI; agent key is 403-blocked for control-plane writes)."
+  },
+  "nextAction": "No agent retry of the deliverable is required. LUH-252 should be closed as a false positive. The only follow-up is a platform/auth config fix owned by Lukas/local-board (see fix_and_handback). If the board still shows LUH-252 as blocked, an authorized token or UI action must set status=done with resolution=false_positive."
+}
