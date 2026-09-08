@@ -20,6 +20,7 @@ import {
   GET as GET_BY_ID,
   PATCH,
 } from "@/app/api/sheets/[id]/route";
+import { GET as GET_BY_ID_FILE } from "@/app/api/sheets/[id]/file/route";
 
 const sample = {
   title: "Brass Festival",
@@ -153,14 +154,58 @@ describe("SheetMusic API integration (kritischer CRUD-Pfad)", () => {
     }
   });
 
-  it("lehnt ungültige Schwierigkeit ab (Validierung)", async () => {
-    const res = await POST(
-      new Request("http://localhost/api/sheets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: "X", difficulty: "UNBEKANNT" }),
-      })
-    );
-    expect(res.status).toBe(400);
-  });
-});
+it("lehnt ungültige Schwierigkeit ab (Validierung)", async () => {
+     const res = await POST(
+       new Request("http://localhost/api/sheets", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ title: "X", difficulty: "UNBEKANNT" }),
+       })
+     );
+     expect(res.status).toBe(400);
+   });
+
+   it("liefert eine verknüpfte PDF-Datei über /api/sheets/[id]/file", async () => {
+     const postRes = await POST(
+       new Request("http://localhost/api/sheets", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ title: "FileTest", composer: "Test" }),
+       })
+     );
+     expect(postRes.status).toBe(201);
+     const created = (await postRes.json()) as { sheet: { id: string } };
+     createdIds.push(created.sheet.id);
+
+     const { saveSheetFile } = await import("@/lib/storage");
+     const pdf = new TextEncoder().encode(
+       "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF"
+     );
+     const saved = await saveSheetFile(Buffer.from(pdf), "pdf");
+
+     const patchRes = await PATCH(
+       new Request(`http://localhost/api/sheets/${created.sheet.id}`, {
+         method: "PATCH",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ fileUrl: saved.fileUrl }),
+       }),
+       { params: Promise.resolve({ id: created.sheet.id }) }
+     );
+     expect(patchRes.status).toBe(200);
+
+     const fileRes = await GET_BY_ID_FILE(
+       new Request(`http://localhost/api/sheets/${created.sheet.id}/file`),
+       { params: Promise.resolve({ id: created.sheet.id }) }
+     );
+     expect(fileRes.status).toBe(200);
+     expect(fileRes.headers.get("Content-Type")).toBe("application/pdf");
+     const out = Buffer.from(new Uint8Array(await fileRes.arrayBuffer()));
+     expect(out.toString("latin1")).toBe(Buffer.from(pdf).toString("latin1"));
+
+     const delRes = await DELETE(
+       new Request(`http://localhost/api/sheets/${created.sheet.id}`),
+       { params: Promise.resolve({ id: created.sheet.id }) }
+     );
+     expect(delRes.status).toBe(200);
+   });
+ });
